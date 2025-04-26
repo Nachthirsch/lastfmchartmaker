@@ -225,18 +225,50 @@ function formatPlaycount(playcount) {
 }
 
 function getArtistImage(artist) {
-  if (!artist) return "";
-  return artistsStore.getArtistLargeImage(artist.name) || "https://via.placeholder.com/150?text=No+Image";
+  if (!artist) {
+    console.log('[COMPONENT] Artist is null or undefined');
+    return "";
+  }
+  
+  console.log(`[COMPONENT] Getting image for artist: "${artist.name}"`);
+  // Use the enhanced getArtistLargeImage method that includes name correction
+  const imageUrl = artistsStore.getArtistLargeImage(artist.name);
+  console.log(`[COMPONENT] Image URL for artist "${artist.name}":`, imageUrl);
+  return imageUrl;
 }
 
 function getAlbumImage(album) {
-  if (!album || !album.image) return "https://via.placeholder.com/150?text=No+Image";
-  return lastfmService.getLargeImage(album.image) || "https://via.placeholder.com/150?text=No+Image";
+  if (!album) {
+    console.log('[COMPONENT] Album is null or undefined');
+    return "https://via.placeholder.com/300?text=No+Image";
+  }
+  
+  if (!album.image) {
+    console.log(`[COMPONENT] No image data for album: "${album.name}"`);
+    return "https://via.placeholder.com/300?text=No+Image";
+  }
+  
+  console.log(`[COMPONENT] Getting image for album: "${album.name}" with ${album.image.length} images`);
+  const imageUrl = lastfmService.getLargeImage(album.image);
+  console.log(`[COMPONENT] Image URL for album "${album.name}":`, imageUrl || 'No valid URL');
+  return imageUrl || "https://via.placeholder.com/300?text=No+Image";
 }
 
 function getTrackImage(track) {
-  if (!track || !track.image) return "https://via.placeholder.com/150?text=No+Image";
-  return lastfmService.getLargeImage(track.image) || "https://via.placeholder.com/150?text=No+Image";
+  if (!track) {
+    console.log('[COMPONENT] Track is null or undefined');
+    return "https://via.placeholder.com/300?text=No+Image";
+  }
+  
+  if (!track.image) {
+    console.log(`[COMPONENT] No image data for track: "${track.name}"`);
+    return "https://via.placeholder.com/300?text=No+Image";
+  }
+  
+  console.log(`[COMPONENT] Getting image for track: "${track.name}" with ${track.image.length} images`);
+  const imageUrl = lastfmService.getLargeImage(track.image);
+  console.log(`[COMPONENT] Image URL for track "${track.name}":`, imageUrl || 'No valid URL');
+  return imageUrl || "https://via.placeholder.com/300?text=No+Image";
 }
 
 // Event handlers for item details

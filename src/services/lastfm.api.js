@@ -85,6 +85,82 @@ export const lastfmService = {
     return "";
   },
 
+  // Get artist correction from Last.fm (for artist name normalization)
+  getArtistCorrection: async (artistName) => {
+    try {
+      console.log(`[API] Attempting to get correction for artist: "${artistName}"`);
+      
+      const response = await lastfmAPI.get("/", {
+        params: {
+          method: "artist.getcorrection",
+          artist: artistName,
+        },
+      });
+
+      console.log(`[API] Correction response for "${artistName}":`, response);
+
+      // Handle both XML and JSON response formats
+      if (response.corrections && response.corrections.correction) {
+        // JSON format
+        if (Array.isArray(response.corrections.correction)) {
+          const correctedArtist = response.corrections.correction[0].artist;
+          console.log(`[API] Artist "${artistName}" corrected to "${correctedArtist.name}" (Array format)`);
+          return correctedArtist;
+        } else {
+          const correctedArtist = response.corrections.correction.artist;
+          console.log(`[API] Artist "${artistName}" corrected to "${correctedArtist.name}" (Object format)`);
+          return correctedArtist;
+        }
+      } else if (response.corrections && response.corrections.artist) {
+        // Alternative format
+        const correctedArtist = response.corrections.artist;
+        console.log(`[API] Artist "${artistName}" corrected to "${correctedArtist.name}" (Direct artist format)`);
+        return correctedArtist;
+      }
+      
+      // If no correction found, return the original artist name
+      console.log(`[API] No correction found for artist "${artistName}", using original name`);
+      return { name: artistName };
+    } catch (error) {
+      console.error(`[API ERROR] Error fetching correction for artist "${artistName}":`, error);
+      // Return the original artist name if there's an error
+      return { name: artistName };
+    }
+  },
+
+  // Get detailed artist information with proper name correction first
+  getArtistInfoWithCorrection: async (artistName) => {
+    try {
+      console.log(`[API] Getting artist info with correction for: "${artistName}"`);
+      
+      // First try to get the corrected artist name
+      const correction = await lastfmService.getArtistCorrection(artistName);
+      
+      // Use the corrected name (or original if no correction found) to get artist info
+      const correctedName = correction.name || artistName;
+      
+      console.log(`[API] Using ${artistName !== correctedName ? 'corrected' : 'original'} name: "${correctedName}" to fetch artist info`);
+      
+      // Now get the artist info with the corrected name
+      const result = await lastfmAPI.get("/", {
+        params: {
+          method: "artist.getinfo",
+          artist: correctedName,
+        },
+      });
+      
+      console.log(`[API] Artist info response for "${correctedName}":`, 
+        result?.artist?.name ? `Found: ${result.artist.name}` : 'No artist found',
+        result?.artist?.image ? `Has ${result.artist.image.length} images` : 'No images'
+      );
+      
+      return result;
+    } catch (error) {
+      console.error(`[API ERROR] Error fetching artist info with correction for "${artistName}":`, error);
+      throw error;
+    }
+  },
+
   // Get user's top artists
   getTopArtists: async (username, period = "overall", limit = 10, page = 1) => {
     try {
@@ -262,14 +338,23 @@ export const lastfmService = {
   // Get detailed artist information
   getArtistInfo: async (artist) => {
     try {
-      return await lastfmAPI.get("/", {
+      console.log(`[API] Getting artist info directly for: "${artist}"`);
+      
+      const result = await lastfmAPI.get("/", {
         params: {
           method: "artist.getinfo",
           artist,
         },
       });
+      
+      console.log(`[API] Direct artist info response for "${artist}":`, 
+        result?.artist?.name ? `Found: ${result.artist.name}` : 'No artist found',
+        result?.artist?.image ? `Has ${result.artist.image.length} images` : 'No images'
+      );
+      
+      return result;
     } catch (error) {
-      console.error("Error fetching artist info:", error);
+      console.error(`[API ERROR] Error fetching direct artist info for "${artist}":`, error);
       throw error;
     }
   },
