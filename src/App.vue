@@ -264,24 +264,19 @@ onMounted(async () => {
         <ItemDetail :type="selectedItemType" :name="selectedItemName" :imageUrl="selectedImageUrl" :itemUrl="selectedItemUrl" :artistInfo="selectedArtist" :albumInfo="selectedAlbum" :trackInfo="selectedTrack" />
       </div>
 
-      <!-- New Top Music Charts Component -->
-      <template v-if="!isLoading && artistsStore.topArtists.length > 0">
-        <TopMusicCharts 
-          @show-artist-details="showArtistDetails"
-          @show-album-details="showAlbumDetails"
-          @show-track-details="showTrackDetails"
-        />
-        
-        <!-- New Top Tags Chart Component -->
-        <div class="mt-8">
-          <TopTagsChart 
-            :username="username"
-            :maxTags="7"
-            :width="800"
-            :height="400"
+      <!-- Charts Section -->
+      <div v-if="!isLoading">
+        <div class="grid grid-cols-1 gap-8 mb-8">
+          <TopMusicCharts 
+            :username="username" 
+            :period="period"
+            @show-artist-details="showArtistDetails"
+            @show-album-details="showAlbumDetails"
+            @show-track-details="showTrackDetails"
           />
+          <TopTagsChart />
         </div>
-      </template>
+      </div>
       
       <div v-else-if="isLoading" class="text-center p-12 bg-black rounded-lg shadow-lg border border-gray-800">
         <div class="flex flex-col items-center">
