@@ -3,22 +3,29 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useArtistsStore } from "./stores/artists";
 import { useAlbumsStore } from "./stores/albums";
 import { useTracksStore } from "./stores/tracks";
+import { useTagsStore } from "./stores/tags";
+import { useUserStore } from "./stores/user";
 import { lastfmService } from "./services/lastfm.api";
 import TopMusicCharts from "./components/charts/TopMusicCharts.vue";
+import TopTagsChart from "./components/charts/TopTagsChart.vue";
 import ItemDetail from "./components/ItemDetail.vue";
 import SpotifyTest from "./components/SpotifyTest.vue";
+import UserProfile from "./components/UserProfile.vue";
 
 // Initialize stores
 const artistsStore = useArtistsStore();
 const albumsStore = useAlbumsStore();
 const tracksStore = useTracksStore();
+const tagsStore = useTagsStore();
+const userStore = useUserStore();
 
 // UI state
 const username = ref("yuunaagi");
 const period = ref("overall");
-const isLoading = computed(() => artistsStore.loading || albumsStore.loading || tracksStore.loading);
+const isLoading = computed(() => artistsStore.loading || albumsStore.loading || tracksStore.loading || tagsStore.loading);
 const showItemDetails = ref(false);
 const showSpotifyTest = ref(false);
+const showUserProfile = ref(false);
 
 // Selected item state
 const selectedItemType = ref(null); // 'artist', 'album', or 'track'
@@ -42,13 +49,24 @@ async function fetchData() {
     artistsStore.setUsername(username.value);
     albumsStore.setUsername(username.value);
     tracksStore.setUsername(username.value);
+    tagsStore.setUsername(username.value);
+
+    console.log('Fetching data for all stores with username:', username.value);
 
     // Fetch all data types
     await Promise.all([
       artistsStore.fetchTopArtists(period.value),
       albumsStore.fetchTopAlbums(period.value),
-      tracksStore.fetchTopTracks(period.value)
+      tracksStore.fetchTopTracks(period.value),
+      tagsStore.fetchTopTags()
     ]);
+
+    console.log('Data fetched successfully:',
+      'Artists:', artistsStore.topArtists.length,
+      'Albums:', albumsStore.topAlbums.length,
+      'Tracks:', tracksStore.topTracks.length,
+      'Tags:', tagsStore.topTags.length
+    );
 
     // Reset selected item when data is refreshed
     showItemDetails.value = false;
@@ -157,8 +175,9 @@ onMounted(async () => {
         <p class="text-gray-400">Create and visualize your music listening history in a modern dashboard</p>
       </header>
 
-      <!-- Spotify Test Toggle Button -->
-      <div class="mb-4 text-center">
+      <!-- Buttons Row -->
+      <div class="mb-4 text-center space-x-4">
+        <!-- Spotify Test Toggle Button -->
         <button 
           @click="toggleSpotifyTest" 
           class="bg-spotify-green hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full mb-4 inline-flex items-center"
@@ -168,11 +187,27 @@ onMounted(async () => {
           </svg>
           {{ showSpotifyTest ? 'Hide Spotify Test' : 'Test Spotify Integration' }}
         </button>
+
+        <!-- User Profile Toggle Button -->
+        <button 
+          @click="showUserProfile = !showUserProfile" 
+          class="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-bold py-2 px-4 rounded-full mb-4 inline-flex items-center"
+        >
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+          </svg>
+          {{ showUserProfile ? 'Hide User Profile' : 'View User Profile' }}
+        </button>
       </div>
 
       <!-- Spotify Test Component -->
       <div v-if="showSpotifyTest" class="mb-8">
         <SpotifyTest />
+      </div>
+
+      <!-- User Profile Component -->
+      <div v-if="showUserProfile" class="mb-8">
+        <UserProfile :username="username" />
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 bg-black rounded-lg shadow-lg border border-gray-800 p-6">
@@ -230,12 +265,23 @@ onMounted(async () => {
       </div>
 
       <!-- New Top Music Charts Component -->
-      <TopMusicCharts 
-        v-if="!isLoading && artistsStore.topArtists.length > 0" 
-        @show-artist-details="showArtistDetails"
-        @show-album-details="showAlbumDetails"
-        @show-track-details="showTrackDetails"
-      />
+      <template v-if="!isLoading && artistsStore.topArtists.length > 0">
+        <TopMusicCharts 
+          @show-artist-details="showArtistDetails"
+          @show-album-details="showAlbumDetails"
+          @show-track-details="showTrackDetails"
+        />
+        
+        <!-- New Top Tags Chart Component -->
+        <div class="mt-8">
+          <TopTagsChart 
+            :username="username"
+            :maxTags="7"
+            :width="800"
+            :height="400"
+          />
+        </div>
+      </template>
       
       <div v-else-if="isLoading" class="text-center p-12 bg-black rounded-lg shadow-lg border border-gray-800">
         <div class="flex flex-col items-center">

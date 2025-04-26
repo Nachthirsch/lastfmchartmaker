@@ -161,21 +161,7 @@
       </div>
     </div>
 
-    <!-- New Items Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-      <div class="bg-gray-900 rounded-lg p-4 min-h-[100px] shadow-md">
-        <h3 class="text-base font-semibold mb-4">New Artists</h3>
-        <!-- New artists will be displayed here -->
-      </div>
-      <div class="bg-gray-900 rounded-lg p-4 min-h-[100px] shadow-md">
-        <h3 class="text-base font-semibold mb-4">New Albums</h3>
-        <!-- New albums will be displayed here -->
-      </div>
-      <div class="bg-gray-900 rounded-lg p-4 min-h-[100px] shadow-md">
-        <h3 class="text-base font-semibold mb-4">New Tracks</h3>
-        <!-- New tracks will be displayed here -->
-      </div>
-    </div>
+
   </div>
 </template>
 
@@ -214,6 +200,73 @@ const otherTopAlbums = computed(() => albumsStore.topAlbums.slice(1, 5) || []);
 const topTrack = computed(() => tracksStore.topTracks[0] || null);
 const otherTopTracks = computed(() => tracksStore.topTracks.slice(1, 5) || []);
 
+// Fetch Spotify images for tracks if they're not already loaded
+onMounted(async () => {
+  console.log('[COMPONENT] Component mounted, checking for image data');
+  
+  // Check if we have tracks but they don't have Spotify images
+  if (tracksStore.topTracks.length > 0 && !tracksStore.topTracks[0].spotifyImage) {
+    console.log('[COMPONENT] Fetching Spotify images for top tracks on component mount');
+    try {
+      // Use the tracks store function to fetch Spotify images
+      await tracksStore.fetchSpotifyImagesForTracks([
+        ...tracksStore.topTracks.slice(0, 5)
+      ]);
+    } catch (error) {
+      console.error('[COMPONENT] Error fetching Spotify images for tracks:', error);
+    }
+  }
+  
+  // Fetch album images for top albums if needed
+  if (topAlbum.value && otherTopAlbums.value.length > 0) {
+    console.log('[COMPONENT] Fetching Spotify images for top albums');
+    try {
+      // Assuming albums might not have a dedicated fetchSpotifyImages function
+      // We'll create a simple approach here
+      await fetchSpotifyImagesForAlbums([
+        topAlbum.value,
+        ...otherTopAlbums.value
+      ]);
+    } catch (error) {
+      console.error('[COMPONENT] Error fetching Spotify images for albums:', error);
+    }
+  }
+});
+
+// Function to fetch Spotify images for albums
+async function fetchSpotifyImagesForAlbums(albums) {
+  if (!albums || albums.length === 0) return;
+  
+  console.log(`[COMPONENT] Fetching Spotify images for ${albums.length} albums`);
+  
+  // Process each album to get its Spotify image
+  for (const album of albums) {
+    try {
+      if (album.artist?.name && album.name) {
+        // Use the Spotify API through lastfmService to get track images
+        // This assumes you have a method similar to getSpotifyTrackImage for albums
+        // If not, you might need to use the track image as a fallback
+        const artistName = album.artist.name;
+        const albumName = album.name;
+        
+        console.log(`[COMPONENT] Fetching Spotify image for album: "${albumName}" by "${artistName}"`);
+        
+        // Try to get a representative track from the album to use its image
+        // This assumes your Last.fm service has a method to search for album tracks
+        // If not available, you could add this functionality to the lastfmService
+        const trackImage = await lastfmService.getSpotifyTrackImage(albumName, artistName);
+        
+        if (trackImage) {
+          console.log(`[COMPONENT] Setting Spotify image for album: "${albumName}"`);
+          album.spotifyImage = trackImage;
+        }
+      }
+    } catch (error) {
+      console.error(`[COMPONENT] Error fetching Spotify image for album "${album.name}":`, error);
+    }
+  }
+}
+
 // Helper functions
 function formatTrend(value) {
   return value.toFixed(0);
@@ -243,12 +296,18 @@ function getAlbumImage(album) {
     return "https://via.placeholder.com/300?text=No+Image";
   }
   
+  // Check if the album has a Spotify image first
+  if (album.spotifyImage) {
+    console.log(`[COMPONENT] Using Spotify image for album: "${album.name}"`);
+    return album.spotifyImage;
+  }
+  
   if (!album.image) {
     console.log(`[COMPONENT] No image data for album: "${album.name}"`);
     return "https://via.placeholder.com/300?text=No+Image";
   }
   
-  console.log(`[COMPONENT] Getting image for album: "${album.name}" with ${album.image.length} images`);
+  console.log(`[COMPONENT] Getting Last.fm image for album: "${album.name}" with ${album.image.length} images`);
   const imageUrl = lastfmService.getLargeImage(album.image);
   console.log(`[COMPONENT] Image URL for album "${album.name}":`, imageUrl || 'No valid URL');
   return imageUrl || "https://via.placeholder.com/300?text=No+Image";
@@ -260,12 +319,18 @@ function getTrackImage(track) {
     return "https://via.placeholder.com/300?text=No+Image";
   }
   
+  // Check if the track has a Spotify image first
+  if (track.spotifyImage) {
+    console.log(`[COMPONENT] Using Spotify image for track: "${track.name}"`);
+    return track.spotifyImage;
+  }
+  
   if (!track.image) {
     console.log(`[COMPONENT] No image data for track: "${track.name}"`);
     return "https://via.placeholder.com/300?text=No+Image";
   }
   
-  console.log(`[COMPONENT] Getting image for track: "${track.name}" with ${track.image.length} images`);
+  console.log(`[COMPONENT] Getting Last.fm image for track: "${track.name}" with ${track.image.length} images`);
   const imageUrl = lastfmService.getLargeImage(track.image);
   console.log(`[COMPONENT] Image URL for track "${track.name}":`, imageUrl || 'No valid URL');
   return imageUrl || "https://via.placeholder.com/300?text=No+Image";

@@ -85,6 +85,87 @@ export const lastfmService = {
     return "";
   },
 
+  // Get Spotify track image
+  getSpotifyTrackImage: async (trackName, artistName) => {
+    try {
+      console.log(`[API] Fetching Spotify image for track: "${trackName}" by "${artistName}"`);
+      
+      // First, search for the track on Spotify
+      const spotifySearchURL = "https://api.spotify.com/v1/search";
+      const query = `track:${encodeURIComponent(trackName)} artist:${encodeURIComponent(artistName)}`;
+      
+      // Check if we have access token in localStorage
+      let accessToken = localStorage.getItem('spotify_access_token');
+      const tokenExpiry = localStorage.getItem('spotify_token_expiry');
+      
+      // If token expired or not present, get a new one
+      if (!accessToken || !tokenExpiry || new Date().getTime() > parseInt(tokenExpiry)) {
+        console.log('[API] Getting new Spotify access token');
+        
+        // Get new token using client credentials flow
+        const clientId = import.meta.env.VITE_SPOTIFY_CLIENT_ID;
+        const clientSecret = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET;
+        
+        if (!clientId || !clientSecret) {
+          console.error('[API ERROR] Spotify credentials missing');
+          return "";
+        }
+        
+        const tokenResponse = await fetch('https://accounts.spotify.com/api/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret)
+          },
+          body: 'grant_type=client_credentials'
+        });
+        
+        if (!tokenResponse.ok) {
+          throw new Error('Failed to get Spotify access token');
+        }
+        
+        const tokenData = await tokenResponse.json();
+        accessToken = tokenData.access_token;
+        
+        // Save token with expiry time
+        localStorage.setItem('spotify_access_token', accessToken);
+        localStorage.setItem('spotify_token_expiry', new Date().getTime() + (tokenData.expires_in * 1000));
+      }
+      
+      // Now search for the track
+      const searchResponse = await fetch(`${spotifySearchURL}?q=${query}&type=track&limit=1`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+      
+      if (!searchResponse.ok) {
+        throw new Error('Spotify search failed');
+      }
+      
+      const searchData = await searchResponse.json();
+      
+      // If we found matching tracks
+      if (searchData.tracks && searchData.tracks.items && searchData.tracks.items.length > 0) {
+        const track = searchData.tracks.items[0];
+        
+        // Get the album images
+        if (track.album && track.album.images && track.album.images.length > 0) {
+          // Sort by size and pick the largest image
+          const sortedImages = [...track.album.images].sort((a, b) => (b.height * b.width) - (a.height * a.width));
+          console.log(`[API] Found Spotify image for "${trackName}" by "${artistName}"`);
+          return sortedImages[0].url;
+        }
+      }
+      
+      console.log(`[API] No Spotify image found for "${trackName}" by "${artistName}"`);
+      return "";
+    } catch (error) {
+      console.error(`[API ERROR] Error fetching Spotify image for "${trackName}" by "${artistName}":`, error);
+      return "";
+    }
+  },
+
   // Get artist correction from Last.fm (for artist name normalization)
   getArtistCorrection: async (artistName) => {
     try {
@@ -169,7 +250,7 @@ export const lastfmService = {
           method: "user.gettopartists",
           user: username,
           period, // overall, 7day, 1month, 3month, 6month, 12month
-          limit,
+          limit: 500,
           page,
         },
       });
@@ -187,7 +268,7 @@ export const lastfmService = {
           method: "user.gettopalbums",
           user: username,
           period,
-          limit,
+          limit: 500,
           page,
         },
       });
@@ -200,17 +281,24 @@ export const lastfmService = {
   // Get user's top tracks
   getTopTracks: async (username, period = "overall", limit = 10, page = 1) => {
     try {
-      return await lastfmAPI.get("/", {
+      console.log(`[API] Fetching top tracks for user: "${username}", period: ${period}, limit: ${limit}`);
+      const response = await lastfmAPI.get("/", {
         params: {
           method: "user.gettoptracks",
           user: username,
           period,
-          limit,
+          limit: 500,
           page,
         },
       });
+      
+      if (response && response.toptracks) {
+        console.log(`[API] Successfully retrieved ${response.toptracks.track ? response.toptracks.track.length : 0} top tracks`);
+      }
+      
+      return response;
     } catch (error) {
-      console.error("Error fetching top tracks:", error);
+      console.error(`[API ERROR] Error fetching top tracks for "${username}":`, error);
       throw error;
     }
   },
@@ -243,7 +331,7 @@ export const lastfmService = {
         params: {
           method: "user.gettoptags",
           user: username,
-          limit,
+          limit: 500,
         },
       });
     } catch (error) {
@@ -272,7 +360,8 @@ export const lastfmService = {
   // Get user's recent tracks
   getRecentTracks: async (username, limit = 10, page = 1) => {
     try {
-      return await lastfmAPI.get("/", {
+      console.log(`[API] Fetching recent tracks for user: "${username}", limit: ${limit}, page: ${page}`);
+      const response = await lastfmAPI.get("/", {
         params: {
           method: "user.getrecenttracks",
           user: username,
@@ -280,8 +369,14 @@ export const lastfmService = {
           page,
         },
       });
+      
+      if (response && response.recenttracks) {
+        console.log(`[API] Successfully retrieved ${response.recenttracks.track ? response.recenttracks.track.length : 0} recent tracks`);
+      }
+      
+      return response;
     } catch (error) {
-      console.error("Error fetching recent tracks:", error);
+      console.error(`[API ERROR] Error fetching recent tracks for "${username}":`, error);
       throw error;
     }
   },
@@ -359,18 +454,59 @@ export const lastfmService = {
     }
   },
 
-  // Get detailed album information
-  getAlbumInfo: async (artist, album) => {
+  // Get album information
+  getAlbumInfo: async (artist, album, username = null) => {
     try {
-      return await lastfmAPI.get("/", {
+      console.log(`[API] Getting album info for: "${album}" by "${artist}"`);
+      
+      const params = {
+        method: "album.getInfo",
+        artist,
+        album,
+        autocorrect: 1 // Use Last.fm corrections
+      };
+      
+      // Add username if provided for personalized data
+      if (username) {
+        params.username = username;
+      }
+      
+      const response = await lastfmAPI.get("/", { params });
+      
+      if (response && response.album) {
+        console.log(`[API] Successfully retrieved album info for "${album}" by "${artist}"`);
+        return response;
+      } else {
+        console.warn(`[API] No album data for "${album}" by "${artist}"`);
+        throw new Error("No album data available");
+      }
+    } catch (error) {
+      console.error(`[API ERROR] Error fetching album info for "${album}" by "${artist}":`, error);
+      throw error;
+    }
+  },
+
+  // Get user information
+  getUserInfo: async (username) => {
+    try {
+      console.log(`[API] Fetching user info for: "${username}"`);
+      
+      const response = await lastfmAPI.get("/", {
         params: {
-          method: "album.getinfo",
-          artist,
-          album,
+          method: "user.getinfo",
+          user: username,
         },
       });
+      
+      if (response && response.user) {
+        console.log(`[API] Successfully retrieved user info for "${username}"`);
+        return response;
+      } else {
+        console.warn(`[API] No user data for "${username}"`);
+        throw new Error("No user data available");
+      }
     } catch (error) {
-      console.error("Error fetching album info:", error);
+      console.error(`[API ERROR] Error fetching user info for "${username}":`, error);
       throw error;
     }
   },
