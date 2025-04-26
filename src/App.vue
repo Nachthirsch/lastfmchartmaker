@@ -54,15 +54,11 @@ async function fetchData() {
 
     console.log('Fetching data for all stores with username:', username.value);
 
-    // Clear previous data before fetching new data
-    tagsStore.clearTags();
-
     // Fetch all data types
     await Promise.all([
       artistsStore.fetchTopArtists(period.value),
       albumsStore.fetchTopAlbums(period.value),
-      tracksStore.fetchTopTracks(period.value),
-      tagsStore.fetchTopTags()
+      tracksStore.fetchTopTracks(period.value)
     ]);
 
     console.log('Data fetched successfully:',

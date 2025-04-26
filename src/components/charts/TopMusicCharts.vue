@@ -195,7 +195,7 @@
     <div ref="shareArtistsTemplate" class="hidden">
       <div class="share-template artists-template">
         <div class="share-header">
-          <h2>MY TOP ARTISTS</h2>
+          <h2>TOP ARTISTS</h2>
           <div class="username">{{ username }}</div>
           <div class="time-range">{{ timeRange }}</div>
         </div>
@@ -229,7 +229,7 @@
     <div ref="shareAlbumsTemplate" class="hidden">
       <div class="share-template albums-template">
         <div class="share-header">
-          <h2>MY TOP ALBUMS</h2>
+          <h2>TOP ALBUMS</h2>
           <div class="username">{{ username }}</div>
           <div class="time-range">{{ timeRange }}</div>
         </div>
@@ -263,7 +263,7 @@
     <div ref="shareTracksTemplate" class="hidden">
       <div class="share-template tracks-template">
         <div class="share-header">
-          <h2>MY TOP TRACKS</h2>
+          <h2>TOP TRACKS</h2>
           <div class="username">{{ username }}</div>
           <div class="time-range">{{ timeRange }}</div>
         </div>
@@ -435,17 +435,17 @@ async function shareSection(section) {
     let accentColor = '#FF7597';
     
     if (section === 'artists') {
-      title = 'MY TOP ARTISTS';
+      title = 'TOP ARTISTS';
       mainItem = topArtist.value;
       itemList = otherTopArtists.value;
       accentColor = '#FF7597';
     } else if (section === 'albums') {
-      title = 'MY TOP ALBUMS';
+      title = 'TOP ALBUMS';
       mainItem = topAlbum.value;
       itemList = otherTopAlbums.value;
       accentColor = '#4DD4AC';
     } else if (section === 'tracks') {
-      title = 'MY TOP TRACKS';
+      title = 'TOP TRACKS';
       mainItem = topTrack.value;
       itemList = otherTopTracks.value;
       accentColor = '#64B5F6';
