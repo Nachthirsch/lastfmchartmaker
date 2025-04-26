@@ -254,8 +254,8 @@
         </div>
         
         <div class="share-footer">
-          <div class="site-name">LastFM Chart Maker</div>
-          <div class="description">lastfmchartmaker.com</div>
+          <div class="site-name">Last Songs</div>
+          <div class="description">lastsongs.netlify.app</div>
         </div>
       </div>
     </div>
@@ -587,12 +587,12 @@ async function shareSection(section) {
     ctx.fillStyle = accentColor;
     ctx.font = 'bold 42px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('LastFM Chart Maker', canvasWidth / 2, footerY + 50);
+    ctx.fillText('Last Songs', canvasWidth / 2, footerY + 50);
     
     // Draw site URL
     ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
     ctx.font = '32px sans-serif';
-    ctx.fillText('lastfmchartmaker.com', canvasWidth / 2, footerY + 90);
+    ctx.fillText('lastsongs.netlify.app', canvasWidth / 2, footerY + 90);
     
     // Convert canvas to image and trigger download
     const dataUrl = canvas.toDataURL('image/png');
