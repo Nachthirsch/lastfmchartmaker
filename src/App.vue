@@ -20,7 +20,7 @@ const tagsStore = useTagsStore();
 const userStore = useUserStore();
 
 // UI state
-const username = ref("yuunaagi");
+const username = ref("");
 const period = ref("overall");
 const isLoading = computed(() => artistsStore.loading || albumsStore.loading || tracksStore.loading || tagsStore.loading);
 const showItemDetails = ref(false);
@@ -45,6 +45,11 @@ const periods = [
 // Fetch data from Last.fm based on current selections
 async function fetchData() {
   try {
+    if (!username.value.trim()) {
+      console.log('No username provided, skipping data fetch');
+      return;
+    }
+
     // Update username in all stores
     artistsStore.setUsername(username.value);
     albumsStore.setUsername(username.value);
@@ -53,12 +58,15 @@ async function fetchData() {
 
     console.log('Fetching data for all stores with username:', username.value);
 
+    // Clear previous data before fetching new data
+    tagsStore.clearTags();
+
     // Fetch all data types
     await Promise.all([
       artistsStore.fetchTopArtists(period.value),
       albumsStore.fetchTopAlbums(period.value),
       tracksStore.fetchTopTracks(period.value),
-      tagsStore.fetchTopTags()
+      tagsStore.fetchTopTags(period.value)
     ]);
 
     console.log('Data fetched successfully:',
@@ -160,9 +168,9 @@ const selectedItemUrl = computed(() => {
   return "";
 });
 
-// Fetch initial data on component mount
-onMounted(async () => {
-  await fetchData();
+// No automatic data fetching on mount
+onMounted(() => {
+  console.log('App component mounted. Ready for user input.');
 });
 </script>
 

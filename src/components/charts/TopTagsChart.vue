@@ -625,6 +625,30 @@ export default {
       }
     });
     
+    // Watch for username changes
+    watch(() => props.username, (newUsername, oldUsername) => {
+      if (newUsername !== oldUsername && newUsername) {
+        console.log(`TopTagsChart: Username changed from "${oldUsername}" to "${newUsername}"`);
+        tagsStore.setUsername(newUsername);
+        // Fetch tags data when username changes
+        if (newUsername.trim()) {
+          tagsStore.fetchTopTags(props.period);
+        }
+      }
+    });
+    
+    // Watch for period changes 
+    watch(() => props.period, (newPeriod, oldPeriod) => {
+      if (newPeriod !== oldPeriod) {
+        console.log(`TopTagsChart: Period changed from "${oldPeriod}" to "${newPeriod}"`);
+        tagsStore.setPeriod(newPeriod);
+        // Fetch tags data when period changes
+        if (props.username.trim()) {
+          tagsStore.fetchTopTags(newPeriod);
+        }
+      }
+    });
+    
     // Redraw connections on window resize
     const handleResize = () => {
       drawConnections();
@@ -634,8 +658,20 @@ export default {
     onMounted(async () => {
       console.log('TopTagsChart mounted, username:', props.username);
       
-      // Set period in the tags store
-      tagsStore.setPeriod(props.period);
+      // Update store with current props
+      if (props.username) {
+        tagsStore.setUsername(props.username);
+        tagsStore.setPeriod(props.period);
+        
+        // Fetch tags data if we have a username
+        if (props.username.trim()) {
+          try {
+            await tagsStore.fetchTopTags(props.period);
+          } catch (error) {
+            console.error('Error fetching tags data on mount:', error);
+          }
+        }
+      }
       
       // Add window resize listener
       window.addEventListener('resize', handleResize);
