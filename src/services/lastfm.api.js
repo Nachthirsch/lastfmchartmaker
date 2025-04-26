@@ -436,6 +436,74 @@ export const lastfmService = {
       throw error;
     }
   },
+
+  // Get tags for an album
+  getAlbumTags: async (artistName, albumName, limit = 5) => {
+    try {
+      const response = await lastfmAPI.get("/", {
+        params: {
+          method: "album.gettags",
+          artist: artistName,
+          album: albumName,
+          limit,
+        },
+      });
+
+      // Handle response format
+      if (response.tags && response.tags.tag) {
+        return Array.isArray(response.tags.tag) ? response.tags.tag : [response.tags.tag];
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching album tags:", error);
+      return [];
+    }
+  },
+
+  // Get tags for an artist
+  getArtistTags: async (artistName, limit = 5) => {
+    try {
+      const response = await lastfmAPI.get("/", {
+        params: {
+          method: "artist.gettags",
+          artist: artistName,
+          limit,
+        },
+      });
+
+      // Handle response format
+      if (response.tags && response.tags.tag) {
+        return Array.isArray(response.tags.tag) ? response.tags.tag : [response.tags.tag];
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching artist tags:", error);
+      return [];
+    }
+  },
+
+  // Get tags for a track
+  getTrackTags: async (artistName, trackName, limit = 5) => {
+    try {
+      const response = await lastfmAPI.get("/", {
+        params: {
+          method: "track.gettags",
+          artist: artistName,
+          track: trackName,
+          limit,
+        },
+      });
+
+      // Handle response format
+      if (response.tags && response.tags.tag) {
+        return Array.isArray(response.tags.tag) ? response.tags.tag : [response.tags.tag];
+      }
+      return [];
+    } catch (error) {
+      console.error("Error fetching track tags:", error);
+      return [];
+    }
+  },
 };
 
 export default lastfmService;

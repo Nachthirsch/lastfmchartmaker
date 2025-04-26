@@ -9,6 +9,9 @@ import TopMusicCharts from "./components/charts/TopMusicCharts.vue";
 import ItemDetail from "./components/ItemDetail.vue";
 import SpotifyTest from "./components/SpotifyTest.vue";
 import UserProfile from "./components/UserProfile.vue";
+import AllArtistsPage from "./components/AllArtistsPage.vue";
+import AllAlbumsPage from "./components/AllAlbumsPage.vue";
+import AllTracksPage from "./components/AllTracksPage.vue";
 
 // Initialize stores
 const artistsStore = useArtistsStore();
@@ -23,6 +26,9 @@ const isLoading = computed(() => artistsStore.loading || albumsStore.loading || 
 const showItemDetails = ref(false);
 const showSpotifyTest = ref(false);
 const showUserProfile = ref(false);
+const showAllArtists = ref(false);
+const showAllAlbums = ref(false);
+const showAllTracks = ref(false);
 
 // Selected item state
 const selectedItemType = ref(null); // 'artist', 'album', or 'track'
@@ -158,6 +164,40 @@ const selectedItemUrl = computed(() => {
   if (selectedItemType.value === "track" && selectedTrack.value) return selectedTrack.value.url;
   return "";
 });
+
+// Show all top artists
+function viewAllArtists() {
+  console.log('Showing all top artists');
+  showAllArtists.value = true;
+  showAllAlbums.value = false;
+  showAllTracks.value = false;
+  showItemDetails.value = false;
+}
+
+// Show all top albums
+function viewAllAlbums() {
+  console.log('Showing all top albums');
+  showAllArtists.value = false;
+  showAllAlbums.value = true;
+  showAllTracks.value = false;
+  showItemDetails.value = false;
+}
+
+// Show all top tracks
+function viewAllTracks() {
+  console.log('Showing all top tracks');
+  showAllArtists.value = false;
+  showAllAlbums.value = false;
+  showAllTracks.value = true;
+  showItemDetails.value = false;
+}
+
+// Close all detail pages
+function closeAllDetailPages() {
+  showAllArtists.value = false;
+  showAllAlbums.value = false;
+  showAllTracks.value = false;
+}
 
 // No automatic data fetching on mount
 onMounted(() => {
@@ -322,13 +362,47 @@ onMounted(() => {
 
       <!-- Charts Section -->
       <div v-if="!isLoading">
-        <div class="grid grid-cols-1 gap-8 mb-8">
+        <!-- All Artists Page -->
+        <div v-if="showAllArtists" class="mb-8">
+          <AllArtistsPage
+            :username="username"
+            :period="period"
+            @close="closeAllDetailPages"
+            @show-artist-details="showArtistDetails"
+          />
+        </div>
+
+        <!-- All Albums Page -->
+        <div v-else-if="showAllAlbums" class="mb-8">
+          <AllAlbumsPage
+            :username="username"
+            :period="period"
+            @close="closeAllDetailPages"
+            @show-album-details="showAlbumDetails"
+          />
+        </div>
+
+        <!-- All Tracks Page -->
+        <div v-else-if="showAllTracks" class="mb-8">
+          <AllTracksPage
+            :username="username"
+            :period="period"
+            @close="closeAllDetailPages"
+            @show-track-details="showTrackDetails"
+          />
+        </div>
+
+        <!-- Default Overview Charts -->
+        <div v-else class="grid grid-cols-1 gap-8 mb-8">
           <TopMusicCharts 
             :username="username" 
             :period="period"
             @show-artist-details="showArtistDetails"
             @show-album-details="showAlbumDetails"
             @show-track-details="showTrackDetails"
+            @view-all-artists="viewAllArtists"
+            @view-all-albums="viewAllAlbums"
+            @view-all-tracks="viewAllTracks"
           />
         </div>
       </div>

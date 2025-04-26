@@ -81,12 +81,20 @@
       <div class="flex flex-col">
         <div class="flex justify-between items-center mb-2">
           <h3 class="text-lg font-bold">Top Artists</h3>
-          <button @click="shareSection('artists')" class="text-white bg-purple-600 hover:bg-purple-700 transition px-3 py-1 rounded-md text-sm flex items-center">
-            <span class="mr-1">Share</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
-            </svg>
-          </button>
+          <div class="flex gap-2">
+            <button @click="$emit('view-all-artists')" class="text-white bg-purple-600 hover:bg-purple-700 transition px-3 py-1 rounded-md text-sm flex items-center">
+              <span class="mr-1">View All</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+            <button @click="shareSection('artists')" class="text-white bg-purple-600 hover:bg-purple-700 transition px-3 py-1 rounded-md text-sm flex items-center">
+              <span class="mr-1">Share</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+              </svg>
+            </button>
+          </div>
         </div>
         
         <div v-if="topArtist" 
@@ -99,6 +107,20 @@
           <div class="p-4">
             <h3 class="text-lg font-semibold mb-1">#1 {{ topArtist.name }}</h3>
             <div class="text-xs text-gray-400">{{ formatPlaycount(topArtist.playcount) }} scrobbles</div>
+            
+            <!-- Artist Tags -->
+            <div v-if="topArtistTags.length > 0" class="mt-2 flex flex-wrap gap-1">
+              <span class="text-xs text-gray-500">Tags:</span>
+              <div class="flex flex-wrap gap-1">
+                <span 
+                  v-for="(tag, index) in topArtistTags" 
+                  :key="index" 
+                  class="text-xs px-2 py-0.5 bg-purple-600 bg-opacity-30 rounded-full text-purple-300"
+                >
+                  {{ tag.name }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -118,12 +140,20 @@
       <div class="flex flex-col">
         <div class="flex justify-between items-center mb-2">
           <h3 class="text-lg font-bold">Top Albums</h3>
-          <button @click="shareSection('albums')" class="text-white bg-teal-600 hover:bg-teal-700 transition px-3 py-1 rounded-md text-sm flex items-center">
-            <span class="mr-1">Share</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
-            </svg>
-          </button>
+          <div class="flex gap-2">
+            <button @click="$emit('view-all-albums')" class="text-white bg-teal-600 hover:bg-teal-700 transition px-3 py-1 rounded-md text-sm flex items-center">
+              <span class="mr-1">View All</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+            <button @click="shareSection('albums')" class="text-white bg-teal-600 hover:bg-teal-700 transition px-3 py-1 rounded-md text-sm flex items-center">
+              <span class="mr-1">Share</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+              </svg>
+            </button>
+          </div>
         </div>
         
         <div v-if="topAlbum" 
@@ -137,6 +167,20 @@
             <h3 class="text-lg font-semibold mb-1">#1 {{ topAlbum.name }}</h3>
             <div class="text-sm text-gray-500 mb-1">{{ topAlbum.artist?.name }}</div>
             <div class="text-xs text-gray-400">{{ formatPlaycount(topAlbum.playcount) }} scrobbles</div>
+            
+            <!-- Album Tags -->
+            <div v-if="topAlbumTags.length > 0" class="mt-2 flex flex-wrap gap-1">
+              <span class="text-xs text-gray-500">Tags:</span>
+              <div class="flex flex-wrap gap-1">
+                <span 
+                  v-for="(tag, index) in topAlbumTags" 
+                  :key="index" 
+                  class="text-xs px-2 py-0.5 bg-teal-600 bg-opacity-30 rounded-full text-teal-300"
+                >
+                  {{ tag.name }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -156,12 +200,20 @@
       <div class="flex flex-col">
         <div class="flex justify-between items-center mb-2">
           <h3 class="text-lg font-bold">Top Tracks</h3>
-          <button @click="shareSection('tracks')" class="text-white bg-blue-600 hover:bg-blue-700 transition px-3 py-1 rounded-md text-sm flex items-center">
-            <span class="mr-1">Share</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
-            </svg>
-          </button>
+          <div class="flex gap-2">
+            <button @click="$emit('view-all-tracks')" class="text-white bg-blue-600 hover:bg-blue-700 transition px-3 py-1 rounded-md text-sm flex items-center">
+              <span class="mr-1">View All</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+              </svg>
+            </button>
+            <button @click="shareSection('tracks')" class="text-white bg-blue-600 hover:bg-blue-700 transition px-3 py-1 rounded-md text-sm flex items-center">
+              <span class="mr-1">Share</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+              </svg>
+            </button>
+          </div>
         </div>
         
         <div v-if="topTrack" 
@@ -175,6 +227,20 @@
             <h3 class="text-lg font-semibold mb-1">#1 {{ topTrack.name }}</h3>
             <div class="text-sm text-gray-500 mb-1">{{ topTrack.artist?.name }}</div>
             <div class="text-xs text-gray-400">{{ formatPlaycount(topTrack.playcount) }} scrobbles</div>
+            
+            <!-- Track Tags -->
+            <div v-if="topTrackTags.length > 0" class="mt-2 flex flex-wrap gap-1">
+              <span class="text-xs text-gray-500">Tags:</span>
+              <div class="flex flex-wrap gap-1">
+                <span 
+                  v-for="(tag, index) in topTrackTags" 
+                  :key="index" 
+                  class="text-xs px-2 py-0.5 bg-blue-600 bg-opacity-30 rounded-full text-blue-300"
+                >
+                  {{ tag.name }}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -325,7 +391,7 @@ const tracksStore = useTracksStore();
 const userStore = useUserStore();
 
 // Define events for parent component
-const emit = defineEmits(['show-artist-details', 'show-album-details', 'show-track-details']);
+const emit = defineEmits(['show-artist-details', 'show-album-details', 'show-track-details', 'view-all-artists', 'view-all-albums', 'view-all-tracks']);
 
 // User information
 const username = computed(() => {
@@ -369,6 +435,11 @@ const otherTopAlbums = computed(() => albumsStore.topAlbums.slice(1, 5) || []);
 const topTrack = computed(() => tracksStore.topTracks[0] || null);
 const otherTopTracks = computed(() => tracksStore.topTracks.slice(1, 5) || []);
 
+// Tag data for top items
+const topArtistTags = ref([]);
+const topAlbumTags = ref([]);
+const topTrackTags = ref([]);
+
 // References for share templates
 const shareArtistsTemplate = ref(null);
 const shareAlbumsTemplate = ref(null);
@@ -405,7 +476,56 @@ onMounted(async () => {
       console.error('[COMPONENT] Error fetching Spotify images for albums:', error);
     }
   }
+
+  // Fetch tags for top items
+  await fetchTagsForTopItems();
 });
+
+// Fetch tags for top items
+async function fetchTagsForTopItems() {
+  console.log('[COMPONENT] Fetching tags for top items');
+  
+  // Fetch tags for top artist
+  if (topArtist.value) {
+    try {
+      const artistName = topArtist.value.name;
+      console.log(`[COMPONENT] Fetching tags for artist: "${artistName}"`);
+      const tags = await lastfmService.getArtistTags(artistName);
+      topArtistTags.value = tags.slice(0, 3); // Get top 3 tags
+      console.log(`[COMPONENT] Got ${tags.length} tags for artist "${artistName}":`, tags);
+    } catch (error) {
+      console.error('[COMPONENT] Error fetching artist tags:', error);
+    }
+  }
+  
+  // Fetch tags for top album
+  if (topAlbum.value && topAlbum.value.artist?.name) {
+    try {
+      const albumName = topAlbum.value.name;
+      const artistName = topAlbum.value.artist.name;
+      console.log(`[COMPONENT] Fetching tags for album: "${albumName}" by "${artistName}"`);
+      const tags = await lastfmService.getAlbumTags(artistName, albumName);
+      topAlbumTags.value = tags.slice(0, 3); // Get top 3 tags
+      console.log(`[COMPONENT] Got ${tags.length} tags for album "${albumName}":`, tags);
+    } catch (error) {
+      console.error('[COMPONENT] Error fetching album tags:', error);
+    }
+  }
+  
+  // Fetch tags for top track
+  if (topTrack.value && topTrack.value.artist?.name) {
+    try {
+      const trackName = topTrack.value.name;
+      const artistName = topTrack.value.artist.name;
+      console.log(`[COMPONENT] Fetching tags for track: "${trackName}" by "${artistName}"`);
+      const tags = await lastfmService.getTrackTags(artistName, trackName);
+      topTrackTags.value = tags.slice(0, 3); // Get top 3 tags
+      console.log(`[COMPONENT] Got ${tags.length} tags for track "${trackName}":`, tags);
+    } catch (error) {
+      console.error('[COMPONENT] Error fetching track tags:', error);
+    }
+  }
+}
 
 // Completely redesigned share functionality using canvas-based approach
 async function shareSection(section) {
@@ -433,22 +553,26 @@ async function shareSection(section) {
     let itemList = [];
     let bgColor = '#131313';
     let accentColor = '#FF7597';
+    let tags = [];
     
     if (section === 'artists') {
       title = 'TOP ARTISTS';
       mainItem = topArtist.value;
       itemList = otherTopArtists.value;
       accentColor = '#FF7597';
+      tags = topArtistTags.value;
     } else if (section === 'albums') {
       title = 'TOP ALBUMS';
       mainItem = topAlbum.value;
       itemList = otherTopAlbums.value;
       accentColor = '#4DD4AC';
+      tags = topAlbumTags.value;
     } else if (section === 'tracks') {
       title = 'TOP TRACKS';
       mainItem = topTrack.value;
       itemList = otherTopTracks.value;
       accentColor = '#64B5F6';
+      tags = topTrackTags.value;
     }
     
     // Load and prepare fonts
@@ -528,11 +652,49 @@ async function shareSection(section) {
         ctx.font = '40px sans-serif';
         const playcount = formatPlaycount(mainItem.playcount) + ' scrobbles';
         ctx.fillText(playcount, canvasWidth / 2, 1070);
+        
+        // Draw tags if available
+        if (tags && tags.length > 0) {
+          // Draw 'Tags:' label
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.font = '32px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('Tags:', canvasWidth / 2, 1120);
+          
+          // Draw tags in a row
+          ctx.font = 'bold 28px sans-serif';
+          
+          const tagSpacing = 20;
+          const tagMetrics = tags.map(tag => ctx.measureText(tag.name));
+          const totalTagWidth = tagMetrics.reduce((sum, metric, i) => 
+            sum + metric.width + (i < tagMetrics.length - 1 ? tagSpacing : 0), 0);
+          
+          let tagX = (canvasWidth - totalTagWidth) / 2;
+          
+          tags.forEach((tag, index) => {
+            ctx.fillStyle = accentColor;
+            
+            // Draw tag text
+            ctx.textAlign = 'left';
+            ctx.fillText(tag.name, tagX, 1160);
+            
+            // Move to next tag position
+            tagX += tagMetrics[index].width + (index < tags.length - 1 ? tagSpacing : 0);
+            
+            // Add a dot between tags (except after the last tag)
+            if (index < tags.length - 1) {
+              ctx.fillStyle = 'white';
+              ctx.fillText('·', tagX - 15, 1160);
+            }
+          });
+        }
       }
     }
     
+    // Adjust starting point for list items based on whether we have tags
+    const listStartY = tags && tags.length > 0 ? 1200 : 1140;
+    
     // Draw list items
-    const listStartY = 1140;
     const itemHeight = 120;
     const itemWidth = canvasWidth - 120;
     const itemX = 60;
@@ -765,293 +927,171 @@ async function fetchSpotifyImagesForAlbums(albums) {
         
         console.log(`[COMPONENT] Fetching Spotify image for album: "${albumName}" by "${artistName}"`);
         
-        // Try to get a representative track from the album to use its image
-        // This assumes your Last.fm service has a method to search for album tracks
-        // If not available, you could add this functionality to the lastfmService
-        const trackImage = await lastfmService.getSpotifyTrackImage(albumName, artistName);
-        
-        if (trackImage) {
-          console.log(`[COMPONENT] Setting Spotify image for album: "${albumName}"`);
-          album.spotifyImage = trackImage;
+        try {
+          // Try to get album image from Spotify
+          const albumInfo = await lastfmService.getAlbumInfo(artistName, albumName);
+          if (albumInfo && albumInfo.album && albumInfo.album.image) {
+            // Use the largest image available
+            const images = albumInfo.album.image;
+            const largestImage = images.reduce((largest, current) => {
+              return (current.size === 'extralarge' || current.size === 'mega') ? current : largest;
+            }, images[0]);
+            
+            // Update the album object with the image URL
+            if (largestImage && largestImage['#text']) {
+              album.spotifyImage = largestImage['#text'];
+              console.log(`[COMPONENT] Found image for "${albumName}": ${album.spotifyImage}`);
+            }
+          }
+        } catch (albumError) {
+          console.error(`[COMPONENT] Error fetching album image for "${albumName}":`, albumError);
+          
+          // Fallback to trying track image if album image fails
+          try {
+            console.log(`[COMPONENT] Trying to get track image as fallback for "${albumName}"`);
+            // Get a track image from the album's first track
+            const trackImage = await lastfmService.getSpotifyTrackImage(artistName, albumName);
+            if (trackImage) {
+              album.spotifyImage = trackImage;
+              console.log(`[COMPONENT] Found fallback track image for "${albumName}": ${album.spotifyImage}`);
+            }
+          } catch (trackError) {
+            console.error(`[COMPONENT] Fallback track image also failed for "${albumName}":`, trackError);
+          }
         }
       }
     } catch (error) {
-      console.error(`[COMPONENT] Error fetching Spotify image for album "${album.name}":`, error);
+      console.error(`[COMPONENT] Error processing album "${album.name}":`, error);
     }
   }
 }
 
-// Helper functions
+// Format trend percentages
 function formatTrend(value) {
-  return value.toFixed(0);
+  return Number(value).toFixed(1);
 }
 
-function formatPlaycount(playcount) {
-  if (!playcount) return "0";
-  return parseInt(playcount).toLocaleString();
+// Format playcounts with K/M suffix for readability
+function formatPlaycount(count) {
+  if (!count) return '0';
+  
+  count = Number(count);
+  
+  if (count >= 1000000) {
+    return (count / 1000000).toFixed(1) + 'M';
+  } else if (count >= 1000) {
+    return (count / 1000).toFixed(1) + 'K';
+  } else {
+    return count.toString();
+  }
 }
 
+// Get artist image with fallback
 function getArtistImage(artist) {
-  if (!artist) {
-    console.log('[COMPONENT] Artist is null or undefined');
-    return "";
+  // Check for Spotify image first
+  if (artist.spotifyImage) {
+    return artist.spotifyImage;
   }
   
-  console.log(`[COMPONENT] Getting image for artist: "${artist.name}"`);
-  // Use the enhanced getArtistLargeImage method that includes name correction
-  const imageUrl = artistsStore.getArtistLargeImage(artist.name);
-  console.log(`[COMPONENT] Image URL for artist "${artist.name}":`, imageUrl);
-  return imageUrl;
+  // Then check for Last.fm images
+  if (artist.image && Array.isArray(artist.image)) {
+    // Find the largest image available
+    const extralarge = artist.image.find(img => img.size === 'extralarge');
+    const large = artist.image.find(img => img.size === 'large');
+    const medium = artist.image.find(img => img.size === 'medium');
+    
+    if (extralarge && extralarge['#text']) return extralarge['#text'];
+    if (large && large['#text']) return large['#text'];
+    if (medium && medium['#text']) return medium['#text'];
+    
+    // If we have any image with content, use it
+    const anyImage = artist.image.find(img => img['#text']);
+    if (anyImage) return anyImage['#text'];
+  }
+  
+  // Fallback to a placeholder
+  return 'https://via.placeholder.com/300?text=No+Artist+Image';
 }
 
+// Get album image with fallback
 function getAlbumImage(album) {
-  if (!album) {
-    console.log('[COMPONENT] Album is null or undefined');
-    return "https://via.placeholder.com/300?text=No+Image";
-  }
-  
-  // Check if the album has a Spotify image first
+  // Check for Spotify image first
   if (album.spotifyImage) {
-    console.log(`[COMPONENT] Using Spotify image for album: "${album.name}"`);
     return album.spotifyImage;
   }
   
-  if (!album.image) {
-    console.log(`[COMPONENT] No image data for album: "${album.name}"`);
-    return "https://via.placeholder.com/300?text=No+Image";
+  // Then check for Last.fm images
+  if (album.image && Array.isArray(album.image)) {
+    // Find the largest image available
+    const extralarge = album.image.find(img => img.size === 'extralarge');
+    const large = album.image.find(img => img.size === 'large');
+    const medium = album.image.find(img => img.size === 'medium');
+    
+    if (extralarge && extralarge['#text']) return extralarge['#text'];
+    if (large && large['#text']) return large['#text'];
+    if (medium && medium['#text']) return medium['#text'];
+    
+    // If we have any image with content, use it
+    const anyImage = album.image.find(img => img['#text']);
+    if (anyImage) return anyImage['#text'];
   }
   
-  console.log(`[COMPONENT] Getting Last.fm image for album: "${album.name}" with ${album.image.length} images`);
-  const imageUrl = lastfmService.getLargeImage(album.image);
-  console.log(`[COMPONENT] Image URL for album "${album.name}":`, imageUrl || 'No valid URL');
-  return imageUrl || "https://via.placeholder.com/300?text=No+Image";
+  // Fallback to a placeholder
+  return 'https://via.placeholder.com/300?text=No+Album+Image';
 }
 
+// Get track image with fallback
 function getTrackImage(track) {
-  if (!track) {
-    console.log('[COMPONENT] Track is null or undefined');
-    return "https://via.placeholder.com/300?text=No+Image";
-  }
-  
-  // Check if the track has a Spotify image first
+  // Check for Spotify image first
   if (track.spotifyImage) {
-    console.log(`[COMPONENT] Using Spotify image for track: "${track.name}"`);
     return track.spotifyImage;
   }
   
-  if (!track.image) {
-    console.log(`[COMPONENT] No image data for track: "${track.name}"`);
-    return "https://via.placeholder.com/300?text=No+Image";
+  // Then check for Last.fm images
+  if (track.image && Array.isArray(track.image)) {
+    // Find the largest image available
+    const extralarge = track.image.find(img => img.size === 'extralarge');
+    const large = track.image.find(img => img.size === 'large');
+    const medium = track.image.find(img => img.size === 'medium');
+    
+    if (extralarge && extralarge['#text']) return extralarge['#text'];
+    if (large && large['#text']) return large['#text'];
+    if (medium && medium['#text']) return medium['#text'];
+    
+    // If we have any image with content, use it
+    const anyImage = track.image.find(img => img['#text']);
+    if (anyImage) return anyImage['#text'];
   }
   
-  console.log(`[COMPONENT] Getting Last.fm image for track: "${track.name}" with ${track.image.length} images`);
-  const imageUrl = lastfmService.getLargeImage(track.image);
-  console.log(`[COMPONENT] Image URL for track "${track.name}":`, imageUrl || 'No valid URL');
-  return imageUrl || "https://via.placeholder.com/300?text=No+Image";
+  // Fallback to a placeholder
+  return 'https://via.placeholder.com/300?text=No+Track+Image';
 }
 
-// Event handlers for item details
+// Show artist details
 function showArtistDetails(artistName) {
+  if (!artistName) return;
   emit('show-artist-details', artistName);
 }
 
+// Show album details
 function showAlbumDetails(albumName, artistName) {
-  if (!artistName) {
-    console.warn('Missing artist name for album details:', albumName);
-    return;
-  }
-  emit('show-album-details', albumName, artistName);
+  if (!albumName || !artistName) return;
+  emit('show-album-details', { albumName, artistName });
 }
 
+// Show track details
 function showTrackDetails(trackName, artistName) {
-  if (!artistName) {
-    console.warn('Missing artist name for track details:', trackName);
-    return;
-  }
-  emit('show-track-details', trackName, artistName);
+  if (!trackName || !artistName) return;
+  emit('show-track-details', { trackName, artistName });
 }
 </script>
 
 <style scoped>
-/* Share template styles */
-.share-template {
-  background-color: #131313;
-  color: #fff;
-  font-family: 'Montserrat', sans-serif;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  width: 540px;
-  height: 960px;
-  padding: 40px 30px;
-}
+/* Add your styles here */
+</style>
 
-.share-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 40px;
-  text-align: center;
-  width: 100%;
-}
-
-.share-header h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  margin: 0 0 15px 0;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.share-header .username {
-  font-size: 1.6rem;
-  font-weight: 600;
-  margin: 0 0 8px 0;
-  color: #FF7597;
-  width: 100%;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.share-header .time-range {
-  font-size: 1.2rem;
-  font-weight: 500;
-  opacity: 0.8;
-  margin: 0;
-}
-
-.share-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 20px;
-}
-
-.featured-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-  text-align: center;
-  width: 100%;
-}
-
-.featured-item .item-rank {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #FF7597;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.featured-item .item-image {
-  width: 220px;
-  height: 220px;
-  border-radius: 12px;
-  object-fit: cover;
-  margin-bottom: 18px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
-}
-
-.featured-item .item-name {
-  font-size: 1.8rem;
-  font-weight: 700;
-  margin: 0 0 8px 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  padding: 0 10px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.featured-item .item-count {
-  font-size: 1.2rem;
-  opacity: 0.85;
-  font-weight: 500;
-}
-
-.share-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  width: 100%;
-}
-
-.share-list-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  padding: 12px 15px;
-  border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.07);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.share-list-item .item-rank {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-right: 15px;
-  color: #FF7597;
-  min-width: 35px;
-  text-align: center;
-}
-
-.share-list-item .item-details {
-  flex: 1;
-  overflow: hidden;
-  padding-right: 5px;
-}
-
-.share-list-item .item-name {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 5px 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
-}
-
-.share-list-item .item-count {
-  font-size: 0.95rem;
-  opacity: 0.8;
-  font-weight: 500;
-}
-
-.share-footer {
-  margin-top: 40px;
-  text-align: center;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  width: 100%;
-}
-
-.share-footer .site-name {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin-bottom: 5px;
-  color: #FF7597;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.share-footer .description {
-  font-size: 1rem;
-  opacity: 0.75;
-  font-weight: 500;
-}
-
-/* Ensuring templates are properly hidden when not being rendered */
-.hidden {
-  display: none !important;
-  visibility: hidden !important;
-  position: absolute !important;
-  left: -9999px !important;
-  top: -9999px !important;
-}
-</style> 
+<script>
+export default {
+  name: 'TopMusicCharts'
+};
+</script>
