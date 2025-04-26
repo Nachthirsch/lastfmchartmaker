@@ -2,47 +2,77 @@
   <div class="top-tags-chart">
     <div class="chart-header">
       <h2 class="chart-title">TOP TAGS</h2>
+      <button @click="shareTagsChart" class="share-button">
+        <span class="share-text">Share</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+        </svg>
+      </button>
     </div>
     
     <div class="chart-container">
-      <!-- Main visualization -->
-      <div v-if="!loading && !error && displayedTags.length > 0" class="chart-visualization">
-        <div class="time-indicator">
-          <span>{{ timeRange.start }}</span>
-          <div class="time-line"></div>
-          <span>{{ timeRange.end }}</span>
+      <!-- Main visualization - Tag Constellation -->
+      <div 
+        ref="chartRef" 
+        v-if="!loading && !error && displayedTags.length > 0" 
+        class="constellation-visualization"
+      >
+        <div class="time-period">{{ timeRange.start }} - {{ timeRange.end }}</div>
+        
+        <div class="constellation-container" ref="constellationContainer">
+          <!-- Central tag -->
+          <div v-if="displayedTags[0]" class="tag-star central-star" @mouseover="setActiveTag(displayedTags[0])" @mouseleave="setActiveTag(null)">
+            <div class="tag-star-inner" :style="{ backgroundColor: displayedTags[0].color }">
+              <div class="tag-star-pulse" :style="{ borderColor: displayedTags[0].color }"></div>
+            </div>
+            <div class="tag-star-label">{{ displayedTags[0].name }}</div>
         </div>
         
-        <div class="tags-grid">
+          <!-- Orbital tags -->
           <div 
-            v-for="(tag, index) in displayedTags" 
+            v-for="(tag, index) in displayedTags.slice(1)" 
             :key="tag.name"
-            class="tag-item"
+            class="tag-star" 
+            :class="{ 'tag-star-active': activeTag && activeTag.name === tag.name }"
             :style="{ 
-              '--animation-delay': `${index * 0.12}s`,
+              '--rotation-angle': `${(index * 40) % 360}deg`,
+              '--orbit-size': `${getOrbitSize(index)}px`,
+              '--animation-delay': `${index * 0.5}s`,
               '--tag-color': tag.color,
-              '--tag-gradient': tag.gradient,
-              '--tag-order': index
+              '--tag-size': `${getTagSize(tag.count)}px`
             }"
+            @mouseover="setActiveTag(tag)"
+            @mouseleave="setActiveTag(null)"
           >
-            <div class="tag-rank">{{ index + 1 }}</div>
-            <div class="tag-bar-container">
-              <div class="tag-bar">
-                <div class="tag-fill" :style="{ width: `${getPercentage(tag.count)}%` }"></div>
-                <div class="tag-glow"></div>
-                <div class="tag-pulse"></div>
+            <div class="tag-star-inner" :style="{ backgroundColor: tag.color }">
+              <div class="tag-star-pulse" :style="{ borderColor: tag.color }"></div>
+            </div>
+            <div class="tag-star-label">{{ tag.name }}</div>
               </div>
               
-              <div class="tag-details">
-                <span class="tag-name">{{ tag.name }}</span>
-                <span class="tag-count">{{ tag.count }}</span>
+          <!-- Connection lines between related tags -->
+          <svg class="constellation-connections" ref="connectionsSvg">
+            <!-- Lines will be drawn dynamically with JavaScript -->
+          </svg>
+          
+          <!-- Tag details popup -->
+          <div v-if="activeTag" class="tag-details-popup" :style="{ top: tagPopupPosition.top + 'px', left: tagPopupPosition.left + 'px' }">
+            <h3>{{ activeTag.name }}</h3>
+            <div class="tag-weight">Weight: {{ activeTag.count }}</div>
+            <a :href="activeTag.url" target="_blank" class="tag-link">View on Last.fm</a>
               </div>
             </div>
+        
+        <!-- Tag legend -->
+        <div class="tag-legend">
+          <div v-for="(tag, index) in displayedTags.slice(0, 5)" :key="`legend-${tag.name}`" class="legend-item">
+            <div class="legend-color" :style="{ backgroundColor: tag.color }"></div>
+            <div class="legend-text">
+              <div class="legend-name">{{ tag.name }}</div>
+              <div class="legend-count">{{ tag.count }}</div>
           </div>
         </div>
-        
-        <div class="decoration-element decoration-top-right"></div>
-        <div class="decoration-element decoration-bottom-left"></div>
+        </div>
       </div>
       
       <!-- Empty state -->
@@ -61,13 +91,15 @@
       <!-- Loading state -->
       <div v-else-if="loading" class="chart-loading">
         <div class="loading-animation">
-          <div class="loading-bar"></div>
-          <div class="loading-bar"></div>
-          <div class="loading-bar"></div>
-          <div class="loading-bar"></div>
-          <div class="loading-bar"></div>
+          <div class="loading-star"></div>
+          <div class="loading-orbit">
+            <div class="loading-planet"></div>
         </div>
-        <span>Gathering your tags</span>
+          <div class="loading-orbit outer-orbit">
+            <div class="loading-planet"></div>
+          </div>
+        </div>
+        <span>Discovering your musical universe</span>
       </div>
       
       <!-- Error state -->
@@ -87,8 +119,9 @@
 </template>
 
 <script>
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch, nextTick } from 'vue';
 import { useTagsStore } from '../../stores/tags';
+import html2canvas from 'html2canvas';
 
 export default {
   name: 'TopTagsChart',
@@ -97,9 +130,13 @@ export default {
       type: String,
       default: '',
     },
+    period: {
+      type: String,
+      default: 'overall'
+    },
     maxTags: {
       type: Number,
-      default: 8
+      default: 20 // Increased from 8 to show more in the constellation
     },
     width: {
       type: Number,
@@ -107,18 +144,32 @@ export default {
     },
     height: {
       type: Number,
-      default: 450
+      default: 600 // Increased for better visualization
     }
   },
   setup(props) {
     const tagsStore = useTagsStore();
     const loading = computed(() => tagsStore.loading);
     const error = computed(() => tagsStore.error);
+    const chartRef = ref(null);
+    const constellationContainer = ref(null);
+    const connectionsSvg = ref(null);
+    const activeTag = ref(null);
+    const tagPopupPosition = ref({ top: 0, left: 0 });
     
-    // Time range display values
-    const timeRange = ref({
-      start: '1 Apr',
-      end: '30 Apr'
+    // Time range display values based on period prop
+    const timeRange = computed(() => {
+      const periodValue = props.period || 'overall';
+      
+      switch (periodValue) {
+        case '7day': return { start: 'Last Week', end: 'Now' };
+        case '1month': return { start: 'Last Month', end: 'Now' };
+        case '3month': return { start: '3 Months Ago', end: 'Now' };
+        case '6month': return { start: '6 Months Ago', end: 'Now' };
+        case '12month': return { start: 'Last Year', end: 'Now' };
+        case 'overall': return { start: 'All Time', end: 'Now' };
+        default: return { start: 'All Time', end: 'Now' };
+      }
     });
     
     // Get max count for percentage calculations
@@ -127,7 +178,7 @@ export default {
       return Math.max(...tagsStore.topTags.map(tag => parseInt(tag.count)));
     });
     
-    // Calculate percentage for bar width
+    // Calculate percentage for sizing elements
     const getPercentage = (count) => {
       if (maxCount.value === 0) return 0;
       return (parseInt(count) / maxCount.value) * 100;
@@ -148,56 +199,450 @@ export default {
           return {
             ...tag,
             color,
-            gradient
+            gradient,
+            size: getTagSize(tag.count),
+            orbitIndex: index
           };
         });
     });
     
+    // Calculate orbit size based on tag index
+    const getOrbitSize = (index) => {
+      // Create different orbital rings
+      const baseSize = 120;
+      const orbitGroup = Math.floor(index / 5) + 1; // Groups of 5 tags per orbit
+      return baseSize * orbitGroup;
+    };
+    
+    // Calculate tag size based on count
+    const getTagSize = (count) => {
+      const percentage = getPercentage(count);
+      // Min size 20px, max size 60px
+      return 20 + (percentage * 0.4);
+    };
+    
     // Generate vibrant colors with gradients
     const getTagColors = (index) => {
-      // Vibrant color palette
+      // Expanded cosmic color palette
       const colorPairs = [
         { 
-          color: 'rgba(14, 165, 233, 0.95)', 
-          gradient: 'linear-gradient(90deg, rgba(14, 165, 233, 0.95) 0%, rgba(56, 189, 248, 0.95) 100%)' 
-        }, // Sky blue
+          color: 'rgba(255, 190, 11, 0.95)', // Gold
+          gradient: 'linear-gradient(90deg, rgba(255, 190, 11, 0.95), rgba(251, 219, 101, 0.95))' 
+        },
         { 
-          color: 'rgba(253, 186, 116, 0.95)', 
-          gradient: 'linear-gradient(90deg, rgba(253, 186, 116, 0.95) 0%, rgba(251, 146, 60, 0.95) 100%)' 
-        }, // Orange
+          color: 'rgba(45, 149, 214, 0.95)', // Blue
+          gradient: 'linear-gradient(90deg, rgba(45, 149, 214, 0.95), rgba(91, 192, 235, 0.95))' 
+        },
         { 
-          color: 'rgba(134, 239, 172, 0.95)', 
-          gradient: 'linear-gradient(90deg, rgba(52, 211, 153, 0.95) 0%, rgba(16, 185, 129, 0.95) 100%)' 
-        }, // Green
+          color: 'rgba(205, 55, 242, 0.95)', // Purple
+          gradient: 'linear-gradient(90deg, rgba(205, 55, 242, 0.95), rgba(249, 145, 255, 0.95))' 
+        },
         { 
-          color: 'rgba(196, 181, 253, 0.95)', 
-          gradient: 'linear-gradient(90deg, rgba(196, 181, 253, 0.95) 0%, rgba(167, 139, 250, 0.95) 100%)' 
-        }, // Purple
+          color: 'rgba(250, 82, 82, 0.95)', // Red
+          gradient: 'linear-gradient(90deg, rgba(250, 82, 82, 0.95), rgba(252, 136, 136, 0.95))' 
+        },
         { 
-          color: 'rgba(248, 113, 113, 0.95)', 
-          gradient: 'linear-gradient(90deg, rgba(248, 113, 113, 0.95) 0%, rgba(239, 68, 68, 0.95) 100%)' 
-        }, // Red
+          color: 'rgba(25, 211, 174, 0.95)', // Teal
+          gradient: 'linear-gradient(90deg, rgba(25, 211, 174, 0.95), rgba(111, 237, 214, 0.95))' 
+        },
         { 
-          color: 'rgba(20, 184, 166, 0.95)', 
-          gradient: 'linear-gradient(90deg, rgba(20, 184, 166, 0.95) 0%, rgba(13, 148, 136, 0.95) 100%)' 
-        }, // Teal
+          color: 'rgba(255, 135, 171, 0.95)', // Pink
+          gradient: 'linear-gradient(90deg, rgba(255, 135, 171, 0.95), rgba(255, 181, 203, 0.95))' 
+        },
         { 
-          color: 'rgba(251, 113, 133, 0.95)', 
-          gradient: 'linear-gradient(90deg, rgba(251, 113, 133, 0.95) 0%, rgba(244, 63, 94, 0.95) 100%)' 
-        }, // Pink
+          color: 'rgba(138, 201, 38, 0.95)', // Green
+          gradient: 'linear-gradient(90deg, rgba(138, 201, 38, 0.95), rgba(172, 234, 73, 0.95))' 
+        },
         { 
-          color: 'rgba(234, 179, 8, 0.95)', 
-          gradient: 'linear-gradient(90deg, rgba(234, 179, 8, 0.95) 0%, rgba(202, 138, 4, 0.95) 100%)' 
-        }, // Yellow
+          color: 'rgba(255, 159, 28, 0.95)', // Orange
+          gradient: 'linear-gradient(90deg, rgba(255, 159, 28, 0.95), rgba(255, 187, 94, 0.95))' 
+        },
+        { 
+          color: 'rgba(126, 87, 194, 0.95)', // Deep Purple
+          gradient: 'linear-gradient(90deg, rgba(126, 87, 194, 0.95), rgba(173, 142, 230, 0.95))' 
+        },
+        {
+          color: 'rgba(27, 156, 133, 0.95)', // Emerald
+          gradient: 'linear-gradient(90deg, rgba(27, 156, 133, 0.95), rgba(70, 196, 174, 0.95))'
+        }
       ];
       
       return colorPairs[index % colorPairs.length];
     };
     
-    // Fetch data if username is provided
+    // Set active tag for hover effects and popup
+    const setActiveTag = (tag) => {
+      activeTag.value = tag;
+      
+      if (tag && constellationContainer.value) {
+        // Find the tag element position to place the popup
+        const tagElements = constellationContainer.value.querySelectorAll('.tag-star');
+        for (let i = 0; i < tagElements.length; i++) {
+          const tagEl = tagElements[i];
+          if (tagEl.querySelector('.tag-star-label').textContent === tag.name) {
+            const rect = tagEl.getBoundingClientRect();
+            const containerRect = constellationContainer.value.getBoundingClientRect();
+            
+            // Position popup above the tag star
+            tagPopupPosition.value = {
+              top: rect.top - containerRect.top - 100,
+              left: rect.left - containerRect.left
+            };
+            break;
+          }
+        }
+      }
+    };
+    
+    // Draw connection lines between related tags
+    const drawConnections = () => {
+      if (!connectionsSvg.value || displayedTags.value.length < 2) return;
+      
+      // Clear existing connections
+      connectionsSvg.value.innerHTML = '';
+      
+      // Get container dimensions
+      const containerWidth = constellationContainer.value.offsetWidth;
+      const containerHeight = constellationContainer.value.offsetHeight;
+      
+      // Update SVG dimensions
+      connectionsSvg.value.setAttribute('width', containerWidth);
+      connectionsSvg.value.setAttribute('height', containerHeight);
+      
+      // Center point coordinates
+      const centerX = containerWidth / 2;
+      const centerY = containerHeight / 2;
+      
+      // Connect main tag to its closest related tags
+      const mainTag = displayedTags.value[0];
+      
+      // Draw connections from center to other tags
+      displayedTags.value.slice(1, 8).forEach((tag, index) => {
+        // Calculate position based on tag's orbit
+        const angle = (index * 40) % 360;
+        const orbitSize = getOrbitSize(index);
+        const radians = angle * Math.PI / 180;
+        
+        const x = centerX + Math.cos(radians) * orbitSize;
+        const y = centerY + Math.sin(radians) * orbitSize;
+        
+        // Create line element
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', centerX);
+        line.setAttribute('y1', centerY);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', y);
+        line.setAttribute('stroke', mainTag.color);
+        line.setAttribute('stroke-width', '1');
+        line.setAttribute('stroke-opacity', '0.4');
+        line.setAttribute('class', 'constellation-line');
+        
+        // Add line to SVG
+        connectionsSvg.value.appendChild(line);
+        
+        // Add some connections between tags in the same orbit
+        if (index > 0 && index < 7) {
+          const prevIndex = index - 1;
+          const prevAngle = (prevIndex * 40) % 360;
+          const prevRadians = prevAngle * Math.PI / 180;
+          
+          const prevX = centerX + Math.cos(prevRadians) * orbitSize;
+          const prevY = centerY + Math.sin(prevRadians) * orbitSize;
+          
+          // Create connection between adjacent tags
+          const connectionLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          connectionLine.setAttribute('x1', x);
+          connectionLine.setAttribute('y1', y);
+          connectionLine.setAttribute('x2', prevX);
+          connectionLine.setAttribute('y2', prevY);
+          connectionLine.setAttribute('stroke', 'rgba(255, 255, 255, 0.15)');
+          connectionLine.setAttribute('stroke-width', '1');
+          connectionLine.setAttribute('stroke-dasharray', '4,4');
+          connectionLine.setAttribute('class', 'constellation-connection');
+          
+          // Add line to SVG
+          connectionsSvg.value.appendChild(connectionLine);
+        }
+      });
+    };
+    
+    // Share tags chart functionality
+    async function shareTagsChart() {
+      console.log('[COMPONENT] Sharing tags constellation');
+      
+      try {
+        // Create a new canvas-based chart
+        const canvasWidth = 1080;
+        const canvasHeight = 1500;
+        
+        // Create a new canvas element
+        const canvas = document.createElement('canvas');
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Fill background with a starry night effect
+        ctx.fillStyle = 'rgb(10, 15, 30)';
+        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        
+        // Add stars to background
+        for (let i = 0; i < 200; i++) {
+          const x = Math.random() * canvasWidth;
+          const y = Math.random() * canvasHeight;
+          const radius = Math.random() * 1.5;
+          const opacity = Math.random() * 0.8 + 0.2;
+          
+          ctx.beginPath();
+          ctx.arc(x, y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+          ctx.fill();
+        }
+        
+        // Load and prepare fonts
+        const fontFaceSet = document.fonts;
+        await fontFaceSet.ready;
+        
+        // Draw header
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 80px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('MY MUSIC UNIVERSE', canvasWidth / 2, 160);
+        
+        // Draw username if provided
+        if (props.username) {
+          ctx.fillStyle = 'rgba(255, 159, 28, 0.95)'; // Orange color
+          ctx.font = '50px sans-serif';
+          ctx.fillText(props.username, canvasWidth / 2, 240);
+        }
+        
+        // Draw time range
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.font = '36px sans-serif';
+        ctx.fillText(`${timeRange.value.start} - ${timeRange.value.end}`, canvasWidth / 2, props.username ? 300 : 240);
+        
+        // Draw divider line
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.fillRect(canvasWidth / 2 - 60, props.username ? 340 : 280, 120, 2);
+        
+        // Draw constellation
+        const centerX = canvasWidth / 2;
+        const centerY = 600;
+        
+        // Draw connection lines first
+        for (let i = 1; i < Math.min(displayedTags.value.length, 8); i++) {
+          const angle = (i * 40) % 360;
+          const orbitSize = getOrbitSize(i - 1);
+          const radians = angle * Math.PI / 180;
+          
+          const x = centerX + Math.cos(radians) * orbitSize;
+          const y = centerY + Math.sin(radians) * orbitSize;
+          
+          // Draw line from center to this tag
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(x, y);
+          ctx.strokeStyle = displayedTags.value[0].color;
+          ctx.globalAlpha = 0.4;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+          
+          // Draw some connections between adjacent tags
+          if (i > 1 && i < 7) {
+            const prevIndex = i - 1;
+            const prevAngle = (prevIndex * 40) % 360;
+            const prevRadians = prevAngle * Math.PI / 180;
+            
+            const prevX = centerX + Math.cos(prevRadians) * orbitSize;
+            const prevY = centerY + Math.sin(prevRadians) * orbitSize;
+            
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(prevX, prevY);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+        
+        // Draw central tag
+        if (displayedTags.value.length > 0) {
+          const mainTag = displayedTags.value[0];
+          const mainTagSize = 60;
+          
+          // Draw star glow
+          const gradient = ctx.createRadialGradient(centerX, centerY, mainTagSize / 2, centerX, centerY, mainTagSize * 1.5);
+          gradient.addColorStop(0, mainTag.color);
+          gradient.addColorStop(1, 'transparent');
+          
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, mainTagSize * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+          
+          // Draw star
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, mainTagSize / 2, 0, Math.PI * 2);
+          ctx.fillStyle = mainTag.color;
+          ctx.fill();
+          
+          // Draw tag name
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 32px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(mainTag.name, centerX, centerY + mainTagSize + 20);
+          
+          // Draw tag count
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+          ctx.font = '24px sans-serif';
+          ctx.fillText(mainTag.count, centerX, centerY + mainTagSize + 50);
+        }
+        
+        // Draw orbital tags
+        for (let i = 1; i < displayedTags.value.length && i < 15; i++) {
+          const tag = displayedTags.value[i];
+          const angle = (i * 40) % 360;
+          const orbitSize = getOrbitSize(i - 1);
+          const radians = angle * Math.PI / 180;
+          const tagSize = getTagSize(tag.count) / 2;
+          
+          const x = centerX + Math.cos(radians) * orbitSize;
+          const y = centerY + Math.sin(radians) * orbitSize;
+          
+          // Draw star glow
+          const gradient = ctx.createRadialGradient(x, y, tagSize / 2, x, y, tagSize * 1.5);
+          gradient.addColorStop(0, tag.color);
+          gradient.addColorStop(1, 'transparent');
+          
+          ctx.beginPath();
+          ctx.arc(x, y, tagSize * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+          
+          // Draw star
+          ctx.beginPath();
+          ctx.arc(x, y, tagSize / 2, 0, Math.PI * 2);
+          ctx.fillStyle = tag.color;
+          ctx.fill();
+          
+          // Draw tag name
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = `bold ${Math.max(16, 20 * tagSize / 30)}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText(tag.name, x, y + tagSize + 20);
+        }
+        
+        // Draw legend
+        const legendY = centerY + 350;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.fillRect(canvasWidth / 2 - 200, legendY, 400, 2);
+        
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 32px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('TOP TAGS', canvasWidth / 2, legendY + 50);
+        
+        // Draw top 5 tags in legend
+        for (let i = 0; i < Math.min(displayedTags.value.length, 5); i++) {
+          const tag = displayedTags.value[i];
+          const itemY = legendY + 100 + (i * 60);
+          
+          // Draw color indicator
+          ctx.beginPath();
+          ctx.arc(centerX - 150, itemY, 10, 0, Math.PI * 2);
+          ctx.fillStyle = tag.color;
+          ctx.fill();
+          
+          // Draw tag name
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = 'bold 24px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(tag.name, centerX - 130, itemY + 8);
+          
+          // Draw tag count
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+          ctx.font = '20px sans-serif';
+          ctx.textAlign = 'right';
+          ctx.fillText(tag.count, centerX + 150, itemY + 8);
+        }
+        
+        // Draw footer
+        const footerY = canvasHeight - 100;
+        
+        // Draw divider
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.fillRect(canvasWidth / 2 - 150, footerY, 300, 1);
+        
+        // Draw site name
+        ctx.fillStyle = 'rgba(255, 159, 28, 0.95)'; // Orange color
+        ctx.font = 'bold 42px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Last Songs', canvasWidth / 2, footerY + 50);
+        
+        // Draw site URL
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.font = '32px sans-serif';
+        ctx.fillText('lastsongs.netlify.app', canvasWidth / 2, footerY + 90);
+        
+        // Convert canvas to image and trigger download
+        const dataUrl = canvas.toDataURL('image/png');
+        
+        // Create download link with username in filename if available
+        const downloadLink = document.createElement('a');
+        downloadLink.href = dataUrl;
+        
+        // Determine period name for the filename
+        let periodName = 'alltime';
+        switch(props.period) {
+          case '7day': periodName = '7days'; break;
+          case '1month': periodName = '1month'; break;
+          case '3month': periodName = '3months'; break;
+          case '6month': periodName = '6months'; break;
+          case '12month': periodName = '1year'; break;
+        }
+        
+        downloadLink.download = props.username 
+          ? `${props.username}-tag-universe-${periodName}.png` 
+          : `tag-universe-${periodName}.png`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        console.log('[COMPONENT] Successfully shared tags constellation');
+      } catch (error) {
+        console.error('[COMPONENT] Error sharing tags constellation:', error);
+      }
+    }
+    
+    // Set up visualization when tags change
+    watch(() => displayedTags.value, async () => {
+      if (displayedTags.value.length > 0) {
+        // Wait for the DOM to update with the new tags
+        await nextTick();
+        drawConnections();
+      }
+    });
+    
+    // Redraw connections on window resize
+    const handleResize = () => {
+      drawConnections();
+    };
+    
+    // Initialize the component
     onMounted(async () => {
       console.log('TopTagsChart mounted, username:', props.username);
-      // Keeping the same approach as before
+      
+      // Set period in the tags store
+      tagsStore.setPeriod(props.period);
+      
+      // Add window resize listener
+      window.addEventListener('resize', handleResize);
+      
+      // Draw connections after initial render
+      await nextTick();
+      drawConnections();
     });
     
     return {
@@ -206,7 +651,16 @@ export default {
       error, 
       timeRange,
       displayedTags,
-      getPercentage
+      getPercentage,
+      getTagSize,
+      getOrbitSize,
+      shareTagsChart,
+      chartRef,
+      constellationContainer,
+      connectionsSvg,
+      activeTag,
+      tagPopupPosition,
+      setActiveTag
     };
   }
 }
@@ -215,12 +669,12 @@ export default {
 <style scoped>
 /* Base styles */
 .top-tags-chart {
-  --chart-bg: rgba(15, 23, 42, 0.97);
+  --chart-bg: rgb(10, 15, 30);
   --chart-bg-lighter: rgba(30, 41, 59, 0.8);
   --chart-text: #ffffff;
   --chart-text-secondary: rgba(255, 255, 255, 0.65);
-  --chart-accent: #0ea5e9;
-  --chart-accent-hover: #38bdf8;
+  --chart-accent: #ff9f1c;
+  --chart-accent-hover: #ffbe0b;
   --chart-line: rgba(255, 255, 255, 0.15);
   --chart-border-radius: 18px;
   --chart-animation-duration: 0.8s;
@@ -236,6 +690,9 @@ export default {
 .chart-header {
   padding-bottom: 1.75rem;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .chart-title {
@@ -246,7 +703,7 @@ export default {
   position: relative;
   display: inline-block;
   text-transform: uppercase;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  background: linear-gradient(90deg, #ffbe0b, #ff9f1c);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -260,9 +717,37 @@ export default {
   bottom: -12px;
   width: 70px;
   height: 4px;
-  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  background: linear-gradient(90deg, #ffbe0b, #ff9f1c);
   border-radius: 8px;
   animation: shimmer 2s infinite;
+}
+
+/* Share button styling */
+.share-button {
+  background-color: var(--chart-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.share-button:hover {
+  background-color: var(--chart-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.share-button svg {
+  width: 16px;
+  height: 16px;
 }
 
 @keyframes shimmer {
@@ -280,8 +765,8 @@ export default {
   box-shadow: 
     0 10px 30px -5px rgba(0, 0, 0, 0.3),
     0 1px 3px rgba(0, 0, 0, 0.2),
-    inset 0 1px 1px rgba(255, 255, 255, 0.1);
-  min-height: 380px;
+    inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  min-height: 600px; /* Increased height for better visualization */
   display: flex;
   flex-direction: column;
   position: relative;
@@ -289,6 +774,7 @@ export default {
   border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
+/* Starry background effect */
 .chart-container::before {
   content: '';
   position: absolute;
@@ -296,223 +782,347 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    radial-gradient(
-      circle at top right,
-      rgba(56, 189, 248, 0.2),
-      transparent 60%
-    );
-  z-index: -1;
-}
-
-/* Decorative elements */
-.decoration-element {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(40px);
+  background-image: 
+    radial-gradient(1px 1px at 50px 160px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 120px 40px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 40px 60px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 90px 350px, rgba(255, 255, 255, 0.5), rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 250px 150px, rgba(255, 255, 255, 0.6), rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 300px 100px, rgba(255, 255, 255, 0.7), rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 400px 250px, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0));
+  background-repeat: repeat;
+  background-size: 500px 500px;
   opacity: 0.15;
-  z-index: -1;
+  z-index: 0;
 }
 
-.decoration-top-right {
-  top: -20px;
-  right: 10%;
-  width: 150px;
-  height: 150px;
-  background: rgba(56, 189, 248, 0.5);
-  animation: pulse-glow 8s ease-in-out infinite;
-}
-
-.decoration-bottom-left {
-  bottom: -30px;
-  left: 15%;
-  width: 120px;
-  height: 120px;
-  background: rgba(192, 132, 252, 0.5);
-  animation: pulse-glow 8s ease-in-out infinite 2s;
-}
-
-@keyframes pulse-glow {
-  0% { transform: scale(0.8); opacity: 0.1; }
-  50% { transform: scale(1.2); opacity: 0.2; }
-  100% { transform: scale(0.8); opacity: 0.1; }
-}
-
-/* Time indicator */
-.time-indicator {
+/* Constellation visualization */
+.constellation-visualization {
+  width: 100%;
+  height: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 2.5rem;
-  padding: 0.5rem 0;
-  color: var(--chart-text-secondary);
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.time-line {
-  flex: 1;
-  height: 1px;
-  background: var(--chart-line);
-  margin: 0 1rem;
   position: relative;
+  min-height: 550px;
 }
 
-.time-line::before,
-.time-line::after {
+/* Time period display */
+.time-period {
+  color: var(--chart-text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+  display: inline-flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.time-period::before {
   content: '';
-  position: absolute;
+  display: inline-block;
   width: 6px;
   height: 6px;
   background: var(--chart-accent);
   border-radius: 50%;
-  top: -2.5px;
+  margin-right: 8px;
 }
 
-.time-line::before {
+/* Constellation container */
+.constellation-container {
+  width: 100%;
+  height: 400px;
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+/* SVG connections */
+.constellation-connections {
+  position: absolute;
+  top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.time-line::after {
-  right: 0;
+.constellation-line {
+  animation: fadeIn 2s ease-out forwards;
+  opacity: 0;
 }
 
-/* Tags grid */
-.tags-grid {
+.constellation-connection {
+  animation: fadeIn 3s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Tag stars */
+.tag-star {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
-  position: relative;
-  z-index: 2;
-}
-
-.tag-item {
-  display: flex;
   align-items: center;
-  gap: 1.25rem;
-  animation: slideIn var(--chart-animation-duration) cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  animation-delay: var(--animation-delay);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.tag-star:not(.central-star) {
+  transform-origin: center center;
+  animation: orbitAnimation 60s linear infinite;
+  animation-delay: var(--animation-delay, 0s);
 }
 
-/* Tag rank */
-.tag-rank {
-  width: 28px;
-  height: 28px;
-  background: var(--chart-bg-lighter);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--chart-text);
+@keyframes orbitAnimation {
+  from { transform: rotate(var(--rotation-angle, 0deg)) translateX(var(--orbit-size, 100px)) rotate(calc(-1 * var(--rotation-angle, 0deg))) translate(-50%, -50%); }
+  to { transform: rotate(calc(var(--rotation-angle, 0deg) + 360deg)) translateX(var(--orbit-size, 100px)) rotate(calc(-1 * var(--rotation-angle, 0deg) - 360deg)) translate(-50%, -50%); }
+}
+
+.central-star {
+  animation: pulsateCenter 4s ease-in-out infinite;
+}
+
+@keyframes pulsateCenter {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.tag-star-inner {
+  width: var(--tag-size, 30px);
+  height: var(--tag-size, 30px);
   border-radius: 50%;
+  background-color: var(--tag-color, var(--chart-accent));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-}
-
-/* Tag bar container */
-.tag-bar-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-}
-
-/* Tag bars and details */
-.tag-bar {
-  height: 8px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  overflow: hidden;
+  box-shadow: 0 0 15px 5px rgba(var(--tag-color-rgb, 255, 159, 28), 0.3);
   position: relative;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+  z-index: 1;
 }
 
-.tag-fill {
+.tag-star-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
   height: 100%;
-  background: var(--tag-gradient, var(--chart-accent));
-  border-radius: 6px;
-  transform-origin: left;
-  animation: growWidth var(--chart-animation-duration) cubic-bezier(0.26, 0.86, 0.44, 0.98) forwards;
-  animation-delay: calc(var(--animation-delay) + 0.2s);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-@keyframes growWidth {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
-.tag-glow {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 15px;
-  background: var(--tag-color, var(--chart-accent));
-  filter: blur(8px);
-  opacity: 0.7;
-}
-
-.tag-pulse {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 10px;
-  background: var(--tag-color, var(--chart-accent));
-  filter: blur(5px);
+  border-radius: 50%;
+  border: 2px solid var(--tag-color, var(--chart-accent));
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   opacity: 0;
-  animation: pulse 2s ease-in-out infinite;
-  animation-delay: calc(var(--animation-delay) + 1s);
 }
 
 @keyframes pulse {
-  0% { opacity: 0; transform: translateX(-10px) scaleX(1); }
-  50% { opacity: 0.8; transform: translateX(0) scaleX(1.5); }
-  100% { opacity: 0; transform: translateX(10px) scaleX(1); }
+  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
 }
 
-.tag-details {
+.tag-star-label {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  max-width: 100px;
+  text-align: center;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tag-star:hover .tag-star-label,
+.tag-star-active .tag-star-label {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.tag-star:hover .tag-star-inner,
+.tag-star-active .tag-star-inner {
+  transform: scale(1.2);
+}
+
+/* Tag popup */
+.tag-details-popup {
+  position: absolute;
+  background: rgba(20, 30, 50, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 15px;
+  min-width: 150px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  animation: fadeIn 0.2s ease-out forwards;
+  pointer-events: none;
+}
+
+.tag-details-popup h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: white;
+}
+
+.tag-weight {
+  font-size: 0.9rem;
+  color: var(--chart-text-secondary);
+  margin-bottom: 10px;
+}
+
+.tag-link {
+  font-size: 0.8rem;
+  color: var(--chart-accent);
+  text-decoration: none;
+}
+
+/* Tag legend */
+.tag-legend {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: rgba(30, 40, 60, 0.4);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.legend-text {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
-.tag-name {
-  font-size: 1rem;
+.legend-name {
   font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-size: 0.9rem;
 }
 
-.tag-count {
-  font-size: 0.825rem;
-  font-weight: 700;
-  color: var(--tag-color, var(--chart-accent));
-  background: rgba(0, 0, 0, 0.25);
-  padding: 0.35rem 0.75rem;
-  border-radius: 99px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.legend-count {
+  color: var(--chart-text-secondary);
+  font-size: 0.9rem;
 }
 
-/* States styling */
+/* Loading state */
+.chart-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 300px;
+  gap: 1.5rem;
+  color: var(--chart-text-secondary);
+}
+
+.loading-animation {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.loading-star {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--chart-accent);
+  border-radius: 50%;
+  animation: pulseStar 2s ease-in-out infinite;
+}
+
+@keyframes pulseStar {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+}
+
+.loading-orbit {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: rotateOrbit 8s linear infinite;
+}
+
+.loading-orbit.outer-orbit {
+  width: 160px;
+  height: 160px;
+  animation-duration: 12s;
+  animation-direction: reverse;
+}
+
+@keyframes rotateOrbit {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.loading-planet {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(91, 192, 235, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(91, 192, 235, 0.5);
+}
+
+.outer-orbit .loading-planet {
+  background: rgba(250, 82, 82, 0.9);
+  box-shadow: 0 0 10px rgba(250, 82, 82, 0.5);
+}
+
+.chart-loading span {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  color: var(--chart-text);
+}
+
+/* Empty and Error states */
 .chart-empty,
-.chart-loading,
 .chart-error {
   display: flex;
   flex-direction: column;
@@ -524,138 +1134,53 @@ export default {
   color: var(--chart-text-secondary);
 }
 
-/* Empty state */
-.empty-icon svg {
+.empty-icon svg,
+.error-icon svg {
   color: var(--chart-text-secondary);
   opacity: 0.5;
   filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
 }
 
-.chart-empty p {
+.chart-empty p,
+.chart-error p {
   font-size: 1.25rem;
   margin: 0;
   font-weight: 600;
   color: var(--chart-text);
 }
 
-/* Loading state */
-.loading-animation {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  height: 60px;
-  gap: 5px;
-}
-
-.loading-bar {
-  background: var(--chart-accent);
-  width: 6px;
-  height: 20px;
-  border-radius: 3px;
-  animation: loadingBar 1.4s ease-in-out infinite;
-}
-
-.loading-bar:nth-child(1) { animation-delay: 0s; }
-.loading-bar:nth-child(2) { animation-delay: 0.2s; }
-.loading-bar:nth-child(3) { animation-delay: 0.4s; }
-.loading-bar:nth-child(4) { animation-delay: 0.6s; }
-.loading-bar:nth-child(5) { animation-delay: 0.8s; }
-
-@keyframes loadingBar {
-  0%, 100% {
-    height: 10px;
-    background: rgba(56, 189, 248, 0.6);
-  }
-  50% {
-    height: 60px;
-    background: rgba(56, 189, 248, 1);
-  }
-}
-
-.chart-loading span {
-  font-size: 1.1rem;
-  font-weight: 500;
-  margin-top: 1rem;
-}
-
-/* Error state */
-.error-icon svg {
-  color: rgba(239, 68, 68, 0.9);
-  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
-}
-
-.chart-error p {
-  font-size: 1.25rem;
-  margin: 0 0 0.5rem 0;
-  color: rgba(239, 68, 68, 0.9);
-  font-weight: 600;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .chart-container {
-    padding: 1.75rem;
+    padding: 1.5rem;
+  }
+  
+  .constellation-container {
+    height: 350px;
+  }
+  
+  .tag-legend {
+    padding: 1rem;
   }
   
   .chart-title {
     font-size: 1.5rem;
-  }
-  
-  .tags-grid {
-    gap: 1.5rem;
-  }
-  
-  .tag-item {
-    gap: 1rem;
-  }
-  
-  .tag-name {
-    font-size: 0.925rem;
-  }
-  
-  .tag-count {
-    font-size: 0.775rem;
-    padding: 0.25rem 0.5rem;
   }
 }
 
 /* Dark glass effect for modern browsers */
 @supports (backdrop-filter: blur(10px)) {
   .chart-container {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(10, 15, 30, 0.85);
     backdrop-filter: blur(16px);
   }
-}
-
-/* Hover effects */
-.tag-item:hover .tag-bar {
-  transform: scaleY(1.8);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.tag-item:hover .tag-name {
-  color: var(--chart-accent-hover);
-  transition: all 0.3s ease;
-  transform: translateX(3px);
-}
-
-.tag-item:hover .tag-count {
-  transform: scale(1.1);
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.tag-item:hover .tag-glow {
-  opacity: 1;
-  width: 30px;
-  filter: blur(10px);
-  transition: all 0.4s ease;
-}
-
-.tag-item:hover .tag-rank {
-  background: var(--tag-color);
-  color: white;
-  transform: scale(1.1);
-  transition: all 0.3s ease;
+  
+  .tag-details-popup {
+    backdrop-filter: blur(10px);
+  }
+  
+  .tag-legend {
+    backdrop-filter: blur(10px);
+  }
 }
 </style> 

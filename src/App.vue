@@ -167,26 +167,83 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-black text-white font-sans pb-16">
-    <div class="max-w-6xl mx-auto p-4 md:p-8">
-      <header class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-white mb-2 tracking-wide">LAST.FM CHART MAKER</h1>
-        <div class="w-24 h-0.5 bg-white mx-auto mb-4"></div>
-        <p class="text-gray-400">Create and visualize your music listening history in a modern dashboard</p>
-      </header>
-
+  <div class="min-h-screen bg-black text-white font-sans">
+    <!-- Full screen header section -->
+    <div class="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-gradient-to-b from-black to-gray-900">
+      <!-- Animated background elements -->
+      <div class="absolute inset-0 overflow-hidden opacity-20">
+        <div class="absolute top-0 left-0 w-full h-full">
+          <div class="absolute w-20 h-20 rounded-full bg-purple-500 animate-pulse" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+          <div class="absolute w-32 h-32 rounded-full bg-blue-500 animate-pulse" style="top: 60%; left: 75%; animation-delay: 0.5s;"></div>
+          <div class="absolute w-24 h-24 rounded-full bg-pink-500 animate-pulse" style="top: 25%; left: 60%; animation-delay: 1s;"></div>
+          <div class="absolute w-16 h-16 rounded-full bg-teal-500 animate-pulse" style="top: 70%; left: 30%; animation-delay: 1.5s;"></div>
+          <div class="absolute w-28 h-28 rounded-full bg-indigo-500 animate-pulse" style="top: 40%; left: 40%; animation-delay: 2s;"></div>
+        </div>
+        
+        <!-- Music notes floating animation -->
+        <div class="absolute top-0 left-1/4 animate-float" style="animation-duration: 15s;">
+          <svg class="w-12 h-12 text-purple-500 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
+          </svg>
+        </div>
+        <div class="absolute top-1/4 right-1/4 animate-float" style="animation-duration: 12s; animation-delay: 2s;">
+          <svg class="w-10 h-10 text-blue-500 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
+          </svg>
+        </div>
+        <div class="absolute bottom-1/3 left-1/3 animate-float" style="animation-duration: 18s; animation-delay: 1s;">
+          <svg class="w-14 h-14 text-pink-500 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Central content -->
+      <div class="z-10 text-center px-4 max-w-4xl mx-auto">
+        <!-- Logo/Icon with glow effect -->
+        <div class="flex justify-center mb-8">
+          <div class="relative">
+            <div class="absolute inset-0 blur-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-70 rounded-full scale-150"></div>
+            <svg class="w-20 h-20 text-white relative z-10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
+            </svg>
+          </div>
+        </div>
+        
+        <!-- Main title with larger size and better gradient -->
+        <h1 class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mb-6 tracking-wide leading-tight">LAST SONGS</h1>
+        
+        <!-- Enhanced divider with animation -->
+        <div class="relative h-1 max-w-md mx-auto mb-8">
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full animate-pulse"></div>
+        </div>
+        
+        <!-- Improved subtitle with better typography and width constraint -->
+        <p class="text-gray-300 text-xl max-w-lg mx-auto leading-relaxed mb-12">
+          Create and visualize your music listening history in a modern, interactive dashboard
+        </p>
+        
+        <!-- Call to action button -->
+        <a href="#main-content" class="inline-flex items-center px-8 py-4 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white font-bold text-lg transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30">
+          Get Started
+          <svg class="w-5 h-5 ml-2 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+          </svg>
+        </a>
+      </div>
+      
+      <!-- Bottom scroll indicator -->
+      <div class="absolute bottom-8 left-0 right-0 flex justify-center animate-bounce">
+        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Main content area -->
+    <div id="main-content" class="max-w-6xl mx-auto p-4 md:p-8">
       <!-- Buttons Row -->
       <div class="mb-4 text-center space-x-4">
-        <!-- Spotify Test Toggle Button -->
-        <button 
-          @click="toggleSpotifyTest" 
-          class="bg-spotify-green hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded-full mb-4 inline-flex items-center"
-        >
-          <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.42.12-.84-.12-.96-.54-.12-.42.12-.84.54-.96 4.56-1.02 8.52-.6 11.64 1.32.42.18.48.66.36 1.08zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.24 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-          </svg>
-          {{ showSpotifyTest ? 'Hide Spotify Test' : 'Test Spotify Integration' }}
-        </button>
 
         <!-- User Profile Toggle Button -->
         <button 
@@ -274,7 +331,7 @@ onMounted(async () => {
             @show-album-details="showAlbumDetails"
             @show-track-details="showTrackDetails"
           />
-          <TopTagsChart />
+          <TopTagsChart :username="username" :period="period" />
         </div>
       </div>
       
@@ -322,6 +379,7 @@ onMounted(async () => {
           <span class="w-3 h-3 rounded-full bg-blue-400"></span>
         </div>
         <p>Powered by <a href="https://www.last.fm/api" target="_blank" class="text-purple-300 no-underline hover:underline">Last.fm API</a> | Built with Vue 3, Pinia, and Tailwind CSS</p>
+        <p>Made with ❤️ by <a href="https://github.com/nachthirsch" target="_blank" class="text-purple-300 no-underline hover:underline">yuunaagi</a></p>
       </footer>
     </div>
   </div>
@@ -330,5 +388,36 @@ onMounted(async () => {
 <style>
 .bg-spotify-green {
   background-color: #1DB954;
+}
+
+/* Animation for floating music notes */
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0);
+    opacity: 0.5;
+  }
+  25% {
+    transform: translateY(-20px) translateX(10px) rotate(5deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-40px) translateX(-10px) rotate(-5deg);
+    opacity: 0.9;
+  }
+  75% {
+    transform: translateY(-20px) translateX(-15px) rotate(3deg);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(0) translateX(0) rotate(0);
+    opacity: 0.5;
+  }
+}
+
+.animate-float {
+  animation-name: float;
+  animation-duration: 15s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 </style>
