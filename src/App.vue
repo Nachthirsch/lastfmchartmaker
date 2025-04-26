@@ -3,11 +3,9 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useArtistsStore } from "./stores/artists";
 import { useAlbumsStore } from "./stores/albums";
 import { useTracksStore } from "./stores/tracks";
-import { useTagsStore } from "./stores/tags";
 import { useUserStore } from "./stores/user";
 import { lastfmService } from "./services/lastfm.api";
 import TopMusicCharts from "./components/charts/TopMusicCharts.vue";
-import TopTagsChart from "./components/charts/TopTagsChart.vue";
 import ItemDetail from "./components/ItemDetail.vue";
 import SpotifyTest from "./components/SpotifyTest.vue";
 import UserProfile from "./components/UserProfile.vue";
@@ -16,13 +14,12 @@ import UserProfile from "./components/UserProfile.vue";
 const artistsStore = useArtistsStore();
 const albumsStore = useAlbumsStore();
 const tracksStore = useTracksStore();
-const tagsStore = useTagsStore();
 const userStore = useUserStore();
 
 // UI state
 const username = ref("yuunaagi");
 const period = ref("overall");
-const isLoading = computed(() => artistsStore.loading || albumsStore.loading || tracksStore.loading || tagsStore.loading);
+const isLoading = computed(() => artistsStore.loading || albumsStore.loading || tracksStore.loading);
 const showItemDetails = ref(false);
 const showSpotifyTest = ref(false);
 const showUserProfile = ref(false);
@@ -49,7 +46,6 @@ async function fetchData() {
     artistsStore.setUsername(username.value);
     albumsStore.setUsername(username.value);
     tracksStore.setUsername(username.value);
-    tagsStore.setUsername(username.value);
 
     console.log('Fetching data for all stores with username:', username.value);
 
@@ -58,14 +54,12 @@ async function fetchData() {
       artistsStore.fetchTopArtists(period.value),
       albumsStore.fetchTopAlbums(period.value),
       tracksStore.fetchTopTracks(period.value),
-      tagsStore.fetchTopTags()
     ]);
 
     console.log('Data fetched successfully:',
       'Artists:', artistsStore.topArtists.length,
       'Albums:', albumsStore.topAlbums.length,
       'Tracks:', tracksStore.topTracks.length,
-      'Tags:', tagsStore.topTags.length
     );
 
     // Reset selected item when data is refreshed
@@ -331,7 +325,6 @@ onMounted(async () => {
             @show-album-details="showAlbumDetails"
             @show-track-details="showTrackDetails"
           />
-          <TopTagsChart :username="username" :period="period" />
         </div>
       </div>
       

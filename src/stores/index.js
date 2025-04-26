@@ -8,4 +8,3 @@ export default pinia;
 export * from "./artists";
 export * from "./albums";
 export * from "./tracks";
-export * from "./tags"; // Added export for tags store

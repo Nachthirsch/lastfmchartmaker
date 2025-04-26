@@ -60,7 +60,6 @@ export const useAlbumsStore = defineStore("albums", {
         listeners: album.listeners ? parseInt(album.listeners).toLocaleString() : "Unknown",
         playcount: album.playcount ? parseInt(album.playcount).toLocaleString() : "Unknown",
         tracks: album.tracks?.track ? (Array.isArray(album.tracks.track) ? album.tracks.track : [album.tracks.track]) : [],
-        tags: album.tags?.tag ? (Array.isArray(album.tags.tag) ? album.tags.tag : [album.tags.tag]) : [],
         url: album.url,
       };
     },

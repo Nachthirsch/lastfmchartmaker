@@ -109,7 +109,6 @@ export const useTracksStore = defineStore("tracks", {
         listeners: track.listeners ? parseInt(track.listeners).toLocaleString() : "Unknown",
         playcount: track.playcount ? parseInt(track.playcount).toLocaleString() : "Unknown",
         duration: formattedDuration,
-        tags: track.toptags?.tag ? (Array.isArray(track.toptags.tag) ? track.toptags.tag : [track.toptags.tag]) : [],
         wiki: track.wiki
           ? {
               summary: track.wiki.summary,

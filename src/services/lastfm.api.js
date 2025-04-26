@@ -324,22 +324,6 @@ export const lastfmService = {
     }
   },
 
-  // Get user's top tags
-  getUserTopTags: async (username, limit = 50) => {
-    try {
-      return await lastfmAPI.get("/", {
-        params: {
-          method: "user.gettoptags",
-          user: username,
-          limit: 500,
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching user top tags:", error);
-      throw error;
-    }
-  },
-
   // Get user's weekly album chart
   getWeeklyAlbumChart: async (username, from = null, to = null) => {
     try {
