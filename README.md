@@ -102,10 +102,6 @@ The application is fully responsive and works well on mobile devices, making it 
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## ⚖️ License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
 ## 🙏 Acknowledgements
 
 - [Last.fm API](https://www.last.fm/api) for providing access to music listening data
