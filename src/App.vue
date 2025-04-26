@@ -142,236 +142,121 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="app-container">
-    <header>
-      <h1>Last.fm Chart Maker</h1>
-      <p>Create and download charts from your Last.fm listening history</p>
-    </header>
+  <div class="min-h-screen bg-black text-white font-sans pb-16">
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
+      <header class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-white mb-2 tracking-wide">LAST.FM CHART MAKER</h1>
+        <div class="w-24 h-0.5 bg-white mx-auto mb-4"></div>
+        <p class="text-gray-400">Create and visualize your music listening history in a modern dashboard</p>
+      </header>
 
-    <div class="controls">
-      <div class="input-group">
-        <label for="username">Last.fm Username</label>
-        <input id="username" v-model="username" type="text" placeholder="Enter your Last.fm username" />
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 bg-black rounded-lg shadow-lg border border-gray-800 p-6">
+        <div class="flex flex-col">
+          <label for="username" class="mb-2 font-bold text-gray-300">Last.fm Username</label>
+          <div class="relative">
+            <input id="username" v-model="username" type="text" placeholder="Enter your Last.fm username" 
+                  class="w-full p-3 bg-gray-900 border border-gray-700 rounded-md text-base text-white placeholder-gray-500 focus:ring-2 focus:ring-purple-300 focus:border-transparent" />
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col">
+          <label for="period" class="mb-2 font-bold text-gray-300">Time Period</label>
+          <div class="relative">
+            <select id="period" v-model="period"
+                    class="w-full appearance-none p-3 bg-gray-900 border border-gray-700 rounded-md text-base text-white focus:ring-2 focus:ring-purple-300 focus:border-transparent pr-10">
+              <option v-for="option in periods" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-end">
+          <button @click="fetchData" :disabled="isLoading" 
+                  class="w-full p-3 rounded-tl-lg rounded-tr-lg rounded-bl-lg bg-gradient-to-r from-purple-300 via-teal-300 to-blue-400 text-black font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed hover:from-purple-400 hover:via-teal-400 hover:to-blue-500 transition duration-200 shadow-md transform hover:-translate-y-1 flex items-center justify-center">
+            <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span v-if="isLoading">Loading...</span>
+            <span v-else>Fetch Data</span>
+          </button>
+        </div>
       </div>
 
-      <div class="input-group">
-        <label for="period">Time Period</label>
-        <select id="period" v-model="period">
-          <option v-for="option in periods" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </option>
-        </select>
+      <!-- Item Details Panel -->
+      <div v-if="showItemDetails" class="bg-gray-900 rounded-lg mb-8 shadow-lg overflow-hidden border border-gray-800">
+        <div class="bg-gradient-to-r from-purple-300 via-teal-300 to-blue-400 text-black p-4 flex justify-between items-center">
+          <h2 class="m-0 text-xl font-bold">{{ selectedItemName }}</h2>
+          <button class="bg-transparent border-none text-black text-3xl cursor-pointer p-0 leading-none hover:text-gray-800 transition-colors duration-200" @click="closeItemDetails">×</button>
+        </div>
+
+        <ItemDetail :type="selectedItemType" :name="selectedItemName" :imageUrl="selectedImageUrl" :itemUrl="selectedItemUrl" :artistInfo="selectedArtist" :albumInfo="selectedAlbum" :trackInfo="selectedTrack" />
       </div>
 
-      <button @click="fetchData" :disabled="isLoading" class="fetch-button">
-        <span v-if="isLoading">Loading...</span>
-        <span v-else>Fetch Data</span>
-      </button>
-    </div>
-
-    <!-- Item Details Panel -->
-    <div v-if="showItemDetails" class="item-details-container">
-      <div class="item-details-header">
-        <h2>{{ selectedItemName }}</h2>
-        <button class="close-button" @click="closeItemDetails">×</button>
+      <!-- New Top Music Charts Component -->
+      <TopMusicCharts 
+        v-if="!isLoading && artistsStore.topArtists.length > 0" 
+        @show-artist-details="showArtistDetails"
+        @show-album-details="showAlbumDetails"
+        @show-track-details="showTrackDetails"
+      />
+      
+      <div v-else-if="isLoading" class="text-center p-12 bg-black rounded-lg shadow-lg border border-gray-800">
+        <div class="flex flex-col items-center">
+          <div class="w-full max-w-md p-5 rounded-tl-lg rounded-tr-lg rounded-bl-lg bg-gradient-to-r from-purple-300 via-teal-300 to-blue-400 text-black relative overflow-hidden min-h-[100px] shadow-md mb-6">
+            <div class="text-base mb-4 font-bold">Loading Your Charts</div>
+            <div class="flex justify-between items-end">
+              <div class="flex flex-col">
+                <span class="text-2xl font-bold">Please Wait</span>
+                <span class="text-sm font-medium">Fetching your Last.fm data...</span>
+              </div>
+              <div class="flex gap-1 items-end h-12">
+                <div class="w-2.5 h-6 bg-black bg-opacity-20 rounded-sm animate-pulse"></div>
+                <div class="w-2.5 h-10 bg-black bg-opacity-20 rounded-sm animate-pulse delay-100"></div>
+                <div class="w-2.5 h-4 bg-black bg-opacity-20 rounded-sm animate-pulse delay-200"></div>
+              </div>
+            </div>
+          </div>
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-300 mb-4"></div>
+          <p class="text-gray-300">Loading your Last.fm data...</p>
+        </div>
+      </div>
+      
+      <div v-else class="text-center p-12 bg-black rounded-lg shadow-lg border border-gray-800">
+        <div class="w-full max-w-md mx-auto p-5 rounded-tl-lg rounded-tr-lg rounded-bl-lg bg-gray-900 relative overflow-hidden min-h-[100px] shadow-md mb-6">
+          <div class="text-base mb-4 font-bold">No Data Available</div>
+          <div class="flex justify-between items-center">
+            <div class="flex flex-col">
+              <span class="text-xl font-bold">Please enter your username</span>
+              <span class="text-sm text-gray-400">And fetch your Last.fm data</span>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
+        <p class="text-gray-400">Enter your Last.fm username and select a time period to see your music charts</p>
       </div>
 
-      <ItemDetail :type="selectedItemType" :name="selectedItemName" :imageUrl="selectedImageUrl" :itemUrl="selectedItemUrl" :artistInfo="selectedArtist" :albumInfo="selectedAlbum" :trackInfo="selectedTrack" />
+      <footer class="text-center mt-12 pt-4 border-t border-gray-800 text-gray-400">
+        <div class="flex justify-center items-center gap-4 mb-2">
+          <span class="w-3 h-3 rounded-full bg-purple-300"></span>
+          <span class="w-3 h-3 rounded-full bg-teal-300"></span>
+          <span class="w-3 h-3 rounded-full bg-blue-400"></span>
+        </div>
+        <p>Powered by <a href="https://www.last.fm/api" target="_blank" class="text-purple-300 no-underline hover:underline">Last.fm API</a> | Built with Vue 3, Pinia, and Tailwind CSS</p>
+      </footer>
     </div>
-
-    <!-- New Top Music Charts Component -->
-    <TopMusicCharts 
-      v-if="!isLoading && artistsStore.topArtists.length > 0" 
-      @show-artist-details="showArtistDetails"
-      @show-album-details="showAlbumDetails"
-      @show-track-details="showTrackDetails"
-    />
-    
-    <div v-else-if="isLoading" class="loading-container">
-      <p>Loading your Last.fm data...</p>
-    </div>
-    
-    <div v-else class="empty-state">
-      <p>No Last.fm data available. Please enter your username and fetch your data.</p>
-    </div>
-
-    <footer>
-      <p>Powered by <a href="https://www.last.fm/api" target="_blank">Last.fm API</a> | Built with Vue 3, Pinia, and Chart.js</p>
-    </footer>
   </div>
 </template>
-
-<style>
-:root {
-  --primary-color: #d51007;
-  --secondary-color: #42b883;
-  --dark-color: #333;
-  --light-color: #f4f4f4;
-  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: "Inter", "Avenir", Helvetica, Arial, sans-serif;
-  background-color: var(--light-color);
-  color: var(--dark-color);
-  line-height: 1.6;
-}
-
-.app-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-header h1 {
-  color: var(--primary-color);
-  margin-bottom: 0.5rem;
-}
-
-.controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: var(--box-shadow);
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-width: 200px;
-}
-
-.input-group label {
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-.input-group input,
-.input-group select {
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.fetch-button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  align-self: flex-end;
-  min-width: 150px;
-}
-
-.fetch-button:hover {
-  background-color: #b81a13;
-}
-
-.fetch-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-/* Item details panel */
-.item-details-container {
-  background-color: white;
-  border-radius: 8px;
-  margin-bottom: 2rem;
-  box-shadow: var(--box-shadow);
-  overflow: hidden;
-}
-
-.item-details-header {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 1rem 1.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.item-details-header h2 {
-  margin: 0;
-  font-size: 1.4rem;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.8rem;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-
-.loading-container {
-  text-align: center;
-  padding: 3rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: var(--box-shadow);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 3rem;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: var(--box-shadow);
-  color: #888;
-}
-
-footer {
-  text-align: center;
-  margin-top: 3rem;
-  padding-top: 1rem;
-  border-top: 1px solid #ddd;
-  color: #666;
-}
-
-footer a {
-  color: var(--primary-color);
-  text-decoration: none;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .app-container {
-    padding: 1rem;
-  }
-  
-  .controls {
-    flex-direction: column;
-  }
-  
-  .fetch-button {
-    align-self: stretch;
-    width: 100%;
-  }
-}
-</style>
