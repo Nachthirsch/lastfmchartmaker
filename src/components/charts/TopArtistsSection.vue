@@ -21,7 +21,7 @@
 
     <div v-if="topArtist" @click="$emit('show-details', topArtist.name)" class="relative mb-6 bg-gray-900 overflow-hidden cursor-pointer transition-all duration-200 hover:translate-y-[-4px] shadow-[8px_8px_0px_0px_rgba(147,51,234,0.7)] border-2 border-white">
       <div class="relative w-full h-48 overflow-hidden">
-        <img :src="getArtistImage(topArtist)" :alt="topArtist.name" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" />
+        <img :src="getArtistImage(topArtist)" :alt="topArtist.name" class="w-full h-full object-cover transition-transform duration-300 hover:scale-105" @error="handleImageError" />
         <div class="absolute bottom-2 left-2 bg-purple-500 text-black text-xs font-bold py-1 px-2 border-2 border-black transform rotate-[-2deg]">Top Artist</div>
       </div>
       <div class="p-4">
@@ -51,13 +51,15 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from "vue";
+import { defineProps, defineEmits, ref, onMounted } from "vue";
 import { formatPlaycount } from "../../utils/formatUtils";
 import { getArtistImage } from "../../utils/imageUtils";
+import { fetchSpotifyImagesForArtists } from "../../utils/apiUtils";
 
-defineEmits(["view-all", "share", "show-details"]);
+const emit = defineEmits(["view-all", "share", "show-details"]);
+const imageFallback = ref(false);
 
-defineProps({
+const props = defineProps({
   topArtist: {
     type: Object,
     default: () => null,
@@ -70,6 +72,66 @@ defineProps({
     type: Array,
     default: () => [],
   },
+});
+
+function handleImageError(event) {
+  console.error("Image failed to load:", event.target.src);
+  console.log("Artist data:", JSON.stringify(props.topArtist, null, 2));
+  imageFallback.value = true;
+  event.target.src = "https://via.placeholder.com/300?text=No+Artist+Image";
+}
+
+// Fetch Spotify images when component is mounted
+onMounted(async () => {
+  if (props.topArtist) {
+    try {
+      console.log("Fetching Spotify images for artists:", 
+        [props.topArtist?.name, ...(props.otherArtists?.map(a => a.name) || [])].filter(Boolean).join(", "));
+      
+      // Create a deep copy of the artists to avoid mutation issues
+      const allArtists = [
+        { ...props.topArtist },
+        ...(props.otherArtists?.map(artist => ({ ...artist })) || [])
+      ].filter(a => a && a.name);
+      
+      // Log artist data before fetching images
+      console.log("Top artist data before image fetch:", JSON.stringify({
+        name: props.topArtist.name,
+        hasSpotifyImage: !!props.topArtist.spotifyImage,
+        image: props.topArtist.image ? `Has ${props.topArtist.image.length} images` : 'No images'
+      }));
+      
+      // Fetch Spotify images
+      await fetchSpotifyImagesForArtists(allArtists);
+      
+      // Apply the Spotify image from our copied object back to the original
+      if (allArtists[0]?.spotifyImage && props.topArtist) {
+        console.log(`Applying Spotify image to topArtist: ${allArtists[0].spotifyImage}`);
+        props.topArtist.spotifyImage = allArtists[0].spotifyImage;
+      }
+      
+      // Apply to other artists if needed
+      if (props.otherArtists?.length && allArtists.length > 1) {
+        for (let i = 0; i < props.otherArtists.length; i++) {
+          const sourceArtist = allArtists[i + 1];
+          if (sourceArtist?.spotifyImage) {
+            props.otherArtists[i].spotifyImage = sourceArtist.spotifyImage;
+          }
+        }
+      }
+      
+      // Test the getArtistImage utility directly
+      if (props.topArtist) {
+        console.log("Testing getArtistImage utility:");
+        const imageUrl = getArtistImage(props.topArtist);
+        console.log(`getArtistImage result for ${props.topArtist.name}: ${imageUrl}`);
+      }
+      
+      console.log("Spotify images fetch complete");
+    } catch (error) {
+      console.error("Error fetching Spotify images:", error);
+    }
+  }
 });
 </script>
 

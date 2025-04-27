@@ -115,6 +115,27 @@ export const spotifyService = {
     }
   },
   
+  // Get artist data by name (for compatibility with apiUtils)
+  async getArtistData(artistName) {
+    try {
+      console.log(`[SPOTIFY] Getting artist data for: "${artistName}"`);
+      
+      // First search for the artist
+      const artist = await this.searchArtist(artistName);
+      
+      if (!artist) {
+        console.log(`[SPOTIFY] No artist found for "${artistName}"`);
+        return null;
+      }
+      
+      // Return the artist data directly
+      return artist;
+    } catch (error) {
+      console.error(`[SPOTIFY ERROR] Failed to get artist data for "${artistName}":`, error);
+      return null;
+    }
+  },
+  
   // Get artist image URL by artist name
   async getArtistImageUrl(artistName) {
     try {
