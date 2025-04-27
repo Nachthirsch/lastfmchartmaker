@@ -57,7 +57,7 @@
     <!-- Artists Grid -->
     <div class="artists-grid">
       <div v-for="(artist, index) in topArtists" :key="artist.mbid || index" @click="showArtistDetails(artist.name)" class="artist-card">
-        <div class="artist-image-container">
+                <div class="artist-image-container">
           <img :src="getArtistImage(artist)" :alt="artist.name" class="artist-image" loading="lazy" />
           <div class="artist-rank">#{{ index + 1 }}</div>
         </div>
@@ -623,7 +623,7 @@ async function createArtistCollage(size) {
   .header-actions {
     align-self: flex-end;
   }
-
+  
   .artists-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
@@ -697,11 +697,11 @@ async function createArtistCollage(size) {
     flex-direction: column;
     gap: 0.5rem;
   }
-
+  
   .artists-grid {
     display: none;
   }
-
+  
   .mobile-artists-list {
     display: flex;
   }

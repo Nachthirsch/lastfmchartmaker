@@ -213,7 +213,7 @@ export const lastfmService = {
           method: "user.gettopartists",
           user: username,
           period, // overall, 7day, 1month, 3month, 6month, 12month
-          limit: 15,
+          limit: 25,
           page,
         },
       });
@@ -230,7 +230,7 @@ export const lastfmService = {
           method: "user.gettopalbums",
           user: username,
           period,
-          limit: 15,
+          limit: 25,
           page,
         },
       });
@@ -247,7 +247,7 @@ export const lastfmService = {
           method: "user.gettoptracks",
           user: username,
           period,
-          limit: 15,
+          limit: 25,
           page,
         },
       });
