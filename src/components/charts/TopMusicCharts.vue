@@ -1,52 +1,36 @@
 <!-- A component displaying top music charts in a modern card layout -->
 <template>
-  <div class="w-full p-5 bg-black text-white font-sans rounded-lg shadow-lg mb-8">
+  <div class="w-full p-8 bg-gray-950 text-white font-sans shadow-[12px_12px_0px_0px_rgba(255,255,255,0.2)] border-4 border-white mb-12">
     <div class="mb-8">
-      <h2 class="text-2xl font-bold uppercase mb-1">TOP MUSIC</h2>
-      <div class="w-24 h-0.5 bg-white"></div>
+      <h2 class="text-3xl font-black uppercase mb-2 tracking-wider transform -rotate-1">TOP MUSIC</h2>
+      <div class="w-36 h-1.5 bg-white border border-white transform rotate-1"></div>
     </div>
 
     <!-- Stats Cards Grid -->
-    <StatsCards 
-      :artists-count="artistsCount"
-      :albums-count="albumsCount" 
-      :tracks-count="tracksCount"
-      :artists-trend="artistsTrend"
-      :albums-trend="albumsTrend"
-      :tracks-trend="tracksTrend"
-    />
+    <StatsCards :artists-count="artistsCount" :albums-count="albumsCount" :tracks-count="tracksCount" :artists-trend="artistsTrend" :albums-trend="albumsTrend" :tracks-trend="tracksTrend" />
+
+    <!-- Period Indicator -->
+    <div class="my-6 px-3 py-2 bg-white text-black inline-block font-bold uppercase tracking-wide transform -rotate-1 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)]">
+      {{ timeRange }}
+    </div>
 
     <!-- Top Items Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
       <!-- Top Artist Section -->
-      <TopArtistsSection 
-        :top-artist="topArtist" 
-        :other-artists="otherTopArtists"
-        :tags="topArtistTags"
-        @view-all="$emit('view-all-artists')"
-        @share="shareSection('artists')"
-        @show-details="showArtistDetails"
-      />
+      <TopArtistsSection :top-artist="topArtist" :other-artists="otherTopArtists" :tags="topArtistTags" @view-all="$emit('view-all-artists')" @share="shareSection('artists')" @show-details="showArtistDetails" />
 
       <!-- Top Album Section -->
-      <TopAlbumsSection 
-        :top-album="topAlbum" 
-        :other-albums="otherTopAlbums"
-        :tags="topAlbumTags"
-        @view-all="$emit('view-all-albums')"
-        @share="shareSection('albums')"
-        @show-details="showAlbumDetails"
-      />
+      <TopAlbumsSection :top-album="topAlbum" :other-albums="otherTopAlbums" :tags="topAlbumTags" @view-all="$emit('view-all-albums')" @share="shareSection('albums')" @show-details="showAlbumDetails" />
 
       <!-- Top Track Section -->
-      <TopTracksSection 
-        :top-track="topTrack" 
-        :other-tracks="otherTopTracks"
-        :tags="topTrackTags"
-        @view-all="$emit('view-all-tracks')"
-        @share="shareSection('tracks')"
-        @show-details="showTrackDetails"
-      />
+      <TopTracksSection :top-track="topTrack" :other-tracks="otherTopTracks" :tags="topTrackTags" @view-all="$emit('view-all-tracks')" @share="shareSection('tracks')" @show-details="showTrackDetails" />
+    </div>
+
+    <!-- Username Display -->
+    <div class="mt-8 text-right">
+      <span class="inline-block px-4 py-2 bg-gray-800 border-2 border-white font-bold transform rotate-1">
+        {{ username }}
+      </span>
     </div>
   </div>
 </template>
@@ -72,12 +56,12 @@ import TopTracksSection from "./TopTracksSection.vue";
 const props = defineProps({
   username: {
     type: String,
-    default: ''
+    default: "",
   },
   period: {
     type: String,
-    default: 'overall'
-  }
+    default: "overall",
+  },
 });
 
 // Initialize stores
@@ -87,27 +71,34 @@ const tracksStore = useTracksStore();
 const userStore = useUserStore();
 
 // Define events for parent component
-const emit = defineEmits(['show-artist-details', 'show-album-details', 'show-track-details', 'view-all-artists', 'view-all-albums', 'view-all-tracks']);
+const emit = defineEmits(["show-artist-details", "show-album-details", "show-track-details", "view-all-artists", "view-all-albums", "view-all-tracks"]);
 
 // User information
 const username = computed(() => {
   // First try to get from props, then fallback to stores
   if (props.username) return props.username;
-  return userStore.username || tracksStore.username || 'music_lover';
+  return userStore.username || tracksStore.username || "music_lover";
 });
 
 const timeRange = computed(() => {
   // First check props, then fallback to stores
-  const periodValue = props.period || 'overall';
-  
+  const periodValue = props.period || "overall";
+
   switch (periodValue) {
-    case '7day': return 'Last 7 days';
-    case '1month': return 'Last month';
-    case '3month': return 'Last 3 months';
-    case '6month': return 'Last 6 months';
-    case '12month': return 'Last year';
-    case 'overall': return 'All time';
-    default: return 'All time';
+    case "7day":
+      return "Last 7 days";
+    case "1month":
+      return "Last month";
+    case "3month":
+      return "Last 3 months";
+    case "6month":
+      return "Last 6 months";
+    case "12month":
+      return "Last year";
+    case "overall":
+      return "All time";
+    default:
+      return "All time";
   }
 });
 
@@ -138,31 +129,26 @@ const topTrackTags = ref([]);
 
 // Fetch Spotify images for tracks if they're not already loaded
 onMounted(async () => {
-  console.log('[COMPONENT] Component mounted, checking for image data');
-  
+  console.log("[COMPONENT] Component mounted, checking for image data");
+
   // Check if we have tracks but they don't have Spotify images
   if (tracksStore.topTracks.length > 0 && !tracksStore.topTracks[0].spotifyImage) {
-    console.log('[COMPONENT] Fetching Spotify images for top tracks on component mount');
+    console.log("[COMPONENT] Fetching Spotify images for top tracks on component mount");
     try {
       // Use the tracks store function to fetch Spotify images
-      await tracksStore.fetchSpotifyImagesForTracks([
-        ...tracksStore.topTracks.slice(0, 5)
-      ]);
+      await tracksStore.fetchSpotifyImagesForTracks([...tracksStore.topTracks.slice(0, 5)]);
     } catch (error) {
-      console.error('[COMPONENT] Error fetching Spotify images for tracks:', error);
+      console.error("[COMPONENT] Error fetching Spotify images for tracks:", error);
     }
   }
-  
+
   // Fetch album images for top albums if needed
   if (topAlbum.value && otherTopAlbums.value.length > 0) {
-    console.log('[COMPONENT] Fetching Spotify images for top albums');
+    console.log("[COMPONENT] Fetching Spotify images for top albums");
     try {
-      await fetchSpotifyImagesForAlbums([
-        topAlbum.value,
-        ...otherTopAlbums.value
-      ]);
+      await fetchSpotifyImagesForAlbums([topAlbum.value, ...otherTopAlbums.value]);
     } catch (error) {
-      console.error('[COMPONENT] Error fetching Spotify images for albums:', error);
+      console.error("[COMPONENT] Error fetching Spotify images for albums:", error);
     }
   }
 
@@ -178,46 +164,46 @@ async function fetchTags() {
     topAlbumTags.value = result.albumTags;
     topTrackTags.value = result.trackTags;
   } catch (error) {
-    console.error('[COMPONENT] Error fetching tags:', error);
+    console.error("[COMPONENT] Error fetching tags:", error);
   }
 }
 
 // Share a section (artists, albums, tracks)
 async function shareSection(section) {
   console.log(`[COMPONENT] Sharing ${section} section`);
-  
+
   try {
     let topItem = null;
     let itemList = [];
     let getItemImage = null;
     let tags = [];
-    
-    if (section === 'artists') {
+
+    if (section === "artists") {
       topItem = topArtist.value;
       itemList = otherTopArtists.value;
       getItemImage = getArtistImage;
       tags = topArtistTags.value;
-    } else if (section === 'albums') {
+    } else if (section === "albums") {
       topItem = topAlbum.value;
       itemList = otherTopAlbums.value;
       getItemImage = getAlbumImage;
       tags = topAlbumTags.value;
-    } else if (section === 'tracks') {
+    } else if (section === "tracks") {
       topItem = topTrack.value;
       itemList = otherTopTracks.value;
       getItemImage = getTrackImage;
       tags = topTrackTags.value;
     }
-    
+
     await shareChart(section, {
       username: username.value,
       timeRange: timeRange.value,
       topItem,
       itemList,
       getItemImage,
-      tags
+      tags,
     });
-    
+
     console.log(`[COMPONENT] Successfully shared ${section}`);
   } catch (error) {
     console.error(`[COMPONENT] Error sharing ${section}:`, error);
@@ -227,24 +213,24 @@ async function shareSection(section) {
 // Show artist details
 function showArtistDetails(artistName) {
   if (!artistName) return;
-  emit('show-artist-details', artistName);
+  emit("show-artist-details", artistName);
 }
 
 // Show album details
 function showAlbumDetails({ albumName, artistName }) {
   if (!albumName || !artistName) return;
-  emit('show-album-details', { albumName, artistName });
+  emit("show-album-details", { albumName, artistName });
 }
 
 // Show track details
 function showTrackDetails({ trackName, artistName }) {
   if (!trackName || !artistName) return;
-  emit('show-track-details', { trackName, artistName });
+  emit("show-track-details", { trackName, artistName });
 }
 </script>
 
 <script>
 export default {
-  name: 'TopMusicCharts'
+  name: "TopMusicCharts",
 };
 </script>
