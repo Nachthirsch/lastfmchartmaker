@@ -212,7 +212,7 @@ onMounted(async () => {
       <div v-else class="share-card-content">
         <!-- Header section -->
         <div class="header-section">
-          <h2 class="header-text"><SPAN class="text-red-500"> LASTFM</SPAN> STATS</h2>
+          <h2 class="header-text"><SPAN class="text-red-500"> LASTFM</SPAN> STATS - Made by <span class="text-red-500">LastSongs</span></h2>
         </div>
         
         <!-- User info section -->
@@ -286,6 +286,7 @@ onMounted(async () => {
               
               <div class="stat-info">
                 <div class="item-name">{{ topAlbum?.name || 'Unknown Album' }}</div>
+                <div class="item-artist">{{ topAlbum?.artist?.name || 'Unknown Artist' }}</div>
                 <div class="item-plays">{{ topAlbum?.playcount || '0' }} PLAYS</div>
               </div>
             </div>
@@ -309,6 +310,7 @@ onMounted(async () => {
               
               <div class="stat-info">
                 <div class="item-name">{{ topTrack?.name || 'Unknown Track' }}</div>
+                <div class="item-artist">{{ topTrack?.artist?.name || 'Unknown Artist' }}</div>
                 <div class="item-plays">{{ topTrack?.playcount || '0' }} PLAYS</div>
               </div>
             </div>
@@ -433,14 +435,14 @@ onMounted(async () => {
 /* Header section */
 .header-section {
   background-color: #333;
-  padding: 15px;
+  padding: 10px;
   text-align: center;
   border-bottom: 3px solid #000;
 }
 
 .header-text {
   margin: 0;
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 900;
   color: white;
   letter-spacing: 1px;
@@ -527,8 +529,8 @@ onMounted(async () => {
 .period-value {
   font-size: 16px;
   font-weight: 800;
-  color: #00000;
-  background-color: #2F7FFF;
+  color: #000000;
+  background-color: #f52d37;
   display: inline-block;
   padding: 4px 12px;
   border: 2px solid #000;
@@ -608,12 +610,25 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: 800;
   color: #FFF;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   line-height: 1.2;
   overflow: hidden;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+}
+
+.item-artist {
+  font-size: 14px;
+  font-weight: 600;
+  color: #a0a0a0;
+  margin-bottom: 2px;
+  line-height: 1.2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  font-style: italic;
 }
 
 .item-plays {
