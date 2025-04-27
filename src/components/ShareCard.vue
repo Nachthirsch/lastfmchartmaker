@@ -212,7 +212,7 @@ onMounted(async () => {
       <div v-else class="share-card-content">
         <!-- Header section -->
         <div class="header-section">
-          <h2 class="header-text"><SPAN class="text-red-500"> LASTFM</SPAN> STATS - Made by <span class="text-red-500">LastSongs</span></h2>
+          <h2 class="header-text">STATS - Made by <span class="text-red-500">LastSongs</span></h2>
         </div>
         
         <!-- User info section -->
@@ -315,11 +315,6 @@ onMounted(async () => {
               </div>
             </div>
           </div>
-        </div>
-        
-        <!-- Footer section -->
-        <div class="footer-section">
-          <p class="credit">CREATED WITH LASTFM CHART MAKER</p>
         </div>
       </div>
     </div>
