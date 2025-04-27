@@ -8,7 +8,7 @@
       <div class="header-actions">
         <div class="collage-dropdown">
           <button @click="showCollageOptions = !showCollageOptions" class="collage-button">
-            <span>Create Collage</span>
+            <span class="button-text">Create Collage</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
               <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
             </svg>
@@ -65,16 +65,6 @@
           <h3 class="album-title">{{ album.name }}</h3>
           <p class="album-artist">{{ album.artist.name }}</p>
           <p class="album-plays">{{ formatPlaycount(album.playcount) }} plays</p>
-
-          <!-- Album Tags -->
-          <div class="album-tags">
-            <button @click.stop="fetchAlbumTags(album)" v-if="!album.tags || album.tags.length === 0" class="tags-button">View Tags</button>
-            <div v-else class="tags-list">
-              <span v-for="(tag, tagIndex) in album.tags" :key="tagIndex" class="tag">
-                {{ tag.name }}
-              </span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -247,16 +237,6 @@ async function createAlbumCollage(size) {
     console.error("[COMPONENT] Error creating album collage:", error);
   }
 }
-
-// Fetch album tags
-async function fetchAlbumTags(album) {
-  try {
-    const tags = await lastfmService.getAlbumTags(album.artist.name, album.name);
-    album.tags = tags.slice(0, 3); // Store top 3 tags
-  } catch (error) {
-    console.error(`[COMPONENT] Error fetching tags for album:`, error);
-  }
-}
 </script>
 
 <style scoped>
@@ -267,6 +247,8 @@ async function fetchAlbumTags(album) {
   box-shadow: 8px 8px 0px #000;
   padding: 1.5rem;
   position: relative;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .page-header {
@@ -274,6 +256,7 @@ async function fetchAlbumTags(album) {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .header-title {
@@ -456,6 +439,8 @@ async function fetchAlbumTags(album) {
   font-size: 0.9rem;
   color: #666;
   padding: 0 0.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .albums-grid {
@@ -586,6 +571,12 @@ async function fetchAlbumTags(album) {
   box-shadow: 3px 3px 0px #000;
   cursor: pointer;
   background-color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mobile-album-item:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #000;
 }
 
 .mobile-album-rank {
@@ -600,6 +591,7 @@ async function fetchAlbumTags(album) {
   height: 50px;
   overflow: hidden;
   border: 1px solid #000;
+  flex-shrink: 0;
 }
 
 .mobile-album-image img {
@@ -656,6 +648,25 @@ async function fetchAlbumTags(album) {
   box-shadow: 2px 2px 0px #000;
 }
 
+/* Improved media queries for better responsiveness */
+
+/* Large tablets and small desktops */
+@media (max-width: 1024px) {
+  .albums-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  .album-details {
+    padding: 0.85rem;
+  }
+  
+  .title {
+    font-size: 1.8rem;
+  }
+}
+
+/* Medium-sized tablets */
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -670,11 +681,73 @@ async function fetchAlbumTags(album) {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
   }
+  
+  .album-title {
+    font-size: 0.95rem;
+  }
+  
+  .album-artist {
+    font-size: 0.85rem;
+  }
+  
+  .album-plays {
+    font-size: 0.8rem;
+  }
+  
+  .dropdown-menu {
+    width: 220px; 
+    right: -10px;
+  }
+  
+  .button-text {
+    font-size: 0.9rem;
+  }
 }
 
+/* Smaller tablets and large phones */
+@media (max-width: 640px) {
+  .albums-page {
+    padding: 1.2rem;
+    border-width: 3px;
+    box-shadow: 6px 6px 0px #000;
+  }
+  
+  .albums-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.85rem;
+  }
+  
+  .album-card {
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  .album-details {
+    padding: 0.75rem;
+  }
+  
+  .title {
+    font-size: 1.6rem;
+  }
+  
+  .back-button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    display: flex;
+  }
+  
+  .page-footer {
+    justify-content: center;
+  }
+}
+
+/* Small phones */
 @media (max-width: 576px) {
   .albums-page {
     padding: 1rem;
+    border-width: 3px;
+    box-shadow: 5px 5px 0px #000;
   }
 
   .page-info {
@@ -688,6 +761,78 @@ async function fetchAlbumTags(album) {
 
   .mobile-albums-list {
     display: flex;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .title-underline {
+    width: 80px;
+    height: 5px;
+  }
+  
+  .collage-button {
+    padding: 0.4rem 0.8rem;
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  .close-button {
+    width: 36px;
+    height: 36px;
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  .close-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .back-button {
+    padding: 0.6rem 1rem;
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 400px) {
+  .mobile-album-item {
+    padding: 0.6rem;
+  }
+  
+  .mobile-album-rank {
+    font-size: 1rem;
+    min-width: 30px;
+  }
+  
+  .mobile-album-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .dropdown-menu {
+    width: 200px;
+    right: -15px;
+  }
+  
+  .dropdown-content {
+    padding: 0.75rem;
+  }
+  
+  .title {
+    font-size: 1.3rem;
+  }
+  
+  .button-text {
+    font-size: 0.8rem;
+  }
+  
+  .header-actions {
+    gap: 0.5rem;
   }
 }
 </style>

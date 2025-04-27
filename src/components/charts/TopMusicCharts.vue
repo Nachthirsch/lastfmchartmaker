@@ -6,9 +6,6 @@
       <div class="w-36 h-1.5 bg-white border border-white transform rotate-1"></div>
     </div>
 
-    <!-- Stats Cards Grid -->
-    <StatsCards :artists-count="artistsCount" :albums-count="albumsCount" :tracks-count="tracksCount" :artists-trend="artistsTrend" :albums-trend="albumsTrend" :tracks-trend="tracksTrend" />
-
     <!-- Period Indicator -->
     <div class="my-6 px-3 py-2 bg-white text-black inline-block font-bold uppercase tracking-wide transform -rotate-1 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)]">
       {{ timeRange }}
@@ -47,7 +44,6 @@ import { getArtistImage, getAlbumImage, getTrackImage } from "../../utils/imageU
 import { fetchTagsForTopItems, fetchSpotifyImagesForAlbums } from "../../utils/apiUtils";
 
 // Import components
-import StatsCards from "./StatsCards.vue";
 import TopArtistsSection from "./TopArtistsSection.vue";
 import TopAlbumsSection from "./TopAlbumsSection.vue";
 import TopTracksSection from "./TopTracksSection.vue";
@@ -102,15 +98,10 @@ const timeRange = computed(() => {
   }
 });
 
-// Data counts and trends
+// Data counts
 const artistsCount = computed(() => artistsStore.topArtists.length);
 const albumsCount = computed(() => albumsStore.topAlbums.length);
 const tracksCount = computed(() => tracksStore.topTracks.length);
-
-// Mock trend data (can be replaced with actual change calculations)
-const artistsTrend = ref(41);
-const albumsTrend = ref(45);
-const tracksTrend = ref(27);
 
 // Computed properties for top items
 const topArtist = computed(() => artistsStore.topArtists[0] || null);

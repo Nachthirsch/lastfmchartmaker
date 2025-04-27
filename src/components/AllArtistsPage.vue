@@ -8,7 +8,7 @@
       <div class="header-actions">
         <div class="collage-dropdown">
           <button @click="showCollageOptions = !showCollageOptions" class="collage-button">
-            <span>Create Collage</span>
+            <span class="button-text">Create Collage</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
               <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
             </svg>
@@ -54,8 +54,24 @@
       <div class="info-count">Total: {{ artistsCount }} artists</div>
     </div>
 
-    <!-- Artists Table -->
-    <div class="artists-table-container">
+    <!-- Toggle View Buttons -->
+    <div class="view-toggle">
+      <button @click="currentView = 'table'" class="view-button" :class="{ active: currentView === 'table' }">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
+        </svg>
+        Table
+      </button>
+      <button @click="currentView = 'grid'" class="view-button" :class="{ active: currentView === 'grid' }">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+        </svg>
+        Grid
+      </button>
+    </div>
+
+    <!-- Artists Table View -->
+    <div v-if="currentView === 'table'" class="artists-table-container">
       <table class="artists-table">
         <thead>
           <tr>
@@ -70,20 +86,11 @@
             <td class="artist-cell">
               <div class="artist-info">
                 <div class="artist-image-container">
-                  <img :src="getArtistImage(artist)" :alt="artist.name" class="artist-image" />
+                  <img :src="getArtistImage(artist)" :alt="artist.name" class="artist-image" loading="lazy" />
+                  <div class="artist-rank-overlay">{{ index + 1 }}</div>
                 </div>
                 <div class="artist-details">
                   <div class="artist-name">{{ artist.name }}</div>
-
-                  <!-- Artist Tags (Fetch on demand) -->
-                  <div class="artist-tags">
-                    <button @click.stop="fetchArtistTags(artist)" v-if="!artist.tags || artist.tags.length === 0" class="tags-button">View Tags</button>
-                    <div v-else class="tags-list">
-                      <span v-for="(tag, tagIndex) in artist.tags" :key="tagIndex" class="tag">
-                        {{ tag.name }}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </td>
@@ -93,6 +100,35 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Artists Grid View -->
+    <div v-if="currentView === 'grid'" class="artists-grid">
+      <div v-for="(artist, index) in topArtists" :key="artist.mbid || index" @click="showArtistDetails(artist.name)" class="artist-card">
+        <div class="artist-image-container-grid">
+          <img :src="getArtistImage(artist)" :alt="artist.name" class="artist-image" loading="lazy" />
+          <div class="artist-rank">#{{ index + 1 }}</div>
+        </div>
+        <div class="artist-details-grid">
+          <h3 class="artist-title">{{ artist.name }}</h3>
+          <p class="artist-plays">{{ formatPlaycount(artist.playcount) }} plays</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Artists List -->
+    <div class="mobile-artists-list">
+      <div v-for="(artist, index) in topArtists" :key="artist.mbid || index" @click="showArtistDetails(artist.name)" class="mobile-artist-item">
+        <div class="mobile-artist-rank">#{{ index + 1 }}</div>
+        <div class="mobile-artist-image">
+          <img :src="getArtistImage(artist)" :alt="artist.name" loading="lazy" />
+          <div class="mobile-artist-rank-overlay">{{ index + 1 }}</div>
+        </div>
+        <div class="mobile-artist-info">
+          <div class="mobile-artist-name">{{ artist.name }}</div>
+          <div class="mobile-artist-plays">{{ formatPlaycount(artist.playcount) }} plays</div>
+        </div>
+      </div>
     </div>
 
     <div class="page-footer">
@@ -131,6 +167,7 @@ const showCollageOptions = ref(false);
 const selectedCollageSize = ref("3x3");
 const collageTheme = ref("dark");
 const showArtistNames = ref(true);
+const currentView = ref("table");
 const collageSizes = [
   { value: "3x3", label: "3×3", gridSize: 3, itemCount: 9 },
   { value: "4x4", label: "4×4", gridSize: 4, itemCount: 16 },
@@ -245,17 +282,6 @@ async function createArtistCollage(size) {
     console.error("[COMPONENT] Error creating artist collage:", error);
   }
 }
-
-// Fetch artist tags
-async function fetchArtistTags(artist) {
-  try {
-    console.log(`[COMPONENT] Fetching tags for artist: "${artist.name}"`);
-    const tags = await lastfmService.getArtistTags(artist.name);
-    artist.tags = tags.slice(0, 3); // Store top 3 tags
-  } catch (error) {
-    console.error(`[COMPONENT] Error fetching tags for artist:`, error);
-  }
-}
 </script>
 
 <style scoped>
@@ -266,6 +292,8 @@ async function fetchArtistTags(artist) {
   box-shadow: 8px 8px 0px #000;
   padding: 1.5rem;
   position: relative;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .page-header {
@@ -273,6 +301,7 @@ async function fetchArtistTags(artist) {
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .header-title {
@@ -455,18 +484,45 @@ async function fetchArtistTags(artist) {
   font-size: 0.9rem;
   color: #666;
   padding: 0 0.25rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.view-button {
+  background-color: #f0f0f0;
+  border: 2px solid #000;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.view-button:hover {
+  background-color: #e0e0e0;
+}
+
+.view-button.active {
+  background-color: #9b5de5;
+  color: white;
 }
 
 .artists-table-container {
   border: 3px solid #000;
   box-shadow: 6px 6px 0px #000;
-  overflow: hidden;
+  overflow: auto; /* Changed from hidden to auto for horizontal scrolling */
   margin-bottom: 1.5rem;
 }
 
 .artists-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 500px; /* Ensures table doesn't get too compressed */
 }
 
 .artists-table th {
@@ -518,11 +574,11 @@ async function fetchArtistTags(artist) {
 }
 
 .artist-image-container {
+  position: relative;
   width: 60px;
   height: 60px;
-  border-radius: 50%;
-  border: 2px solid #000;
   overflow: hidden;
+  border: 2px solid #000;
   flex-shrink: 0;
 }
 
@@ -530,6 +586,19 @@ async function fetchArtistTags(artist) {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.artist-rank-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-weight: 800;
+  padding: 0.2rem 0.4rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  z-index: 1;
 }
 
 .artist-details {
@@ -576,6 +645,87 @@ async function fetchArtistTags(artist) {
   font-weight: 600;
 }
 
+/* Mobile Artists List (initially hidden) */
+.mobile-artists-list {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.mobile-artist-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border: 2px solid #000;
+  box-shadow: 3px 3px 0px #000;
+  cursor: pointer;
+  background-color: white;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mobile-artist-item:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0px #000;
+}
+
+.mobile-artist-rank {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #9b5de5;
+  min-width: 40px;
+}
+
+.mobile-artist-image {
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  border: 1px solid #000;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.mobile-artist-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mobile-artist-rank-overlay {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-weight: 800;
+  padding: 0.2rem 0.4rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  z-index: 1;
+}
+
+.mobile-artist-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-artist-name {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-artist-plays {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.mobile-artist-tags {
+  margin-top: 0.5rem;
+}
+
 .page-footer {
   display: flex;
   justify-content: flex-end;
@@ -599,6 +749,30 @@ async function fetchArtistTags(artist) {
   box-shadow: 2px 2px 0px #000;
 }
 
+/* Improved media queries for better responsiveness */
+
+/* Large tablets and small desktops */
+@media (max-width: 1024px) {
+  .title {
+    font-size: 1.8rem;
+  }
+  
+  .artist-image-container {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .artists-table th {
+    padding: 0.9rem;
+  }
+  
+  .rank-cell {
+    padding: 0.9rem;
+    font-size: 1.1rem;
+  }
+}
+
+/* Medium-sized tablets */
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -608,7 +782,16 @@ async function fetchArtistTags(artist) {
   .header-actions {
     align-self: flex-end;
   }
-
+  
+  .artists-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  
+  .artist-title {
+    font-size: 0.95rem;
+  }
+  
   .artist-image-container {
     width: 50px;
     height: 50px;
@@ -618,24 +801,238 @@ async function fetchArtistTags(artist) {
     width: 60px;
     padding: 0.75rem;
   }
+  
+  .artists-table th {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .artist-cell {
+    padding: 0.6rem 0.75rem;
+  }
+  
+  .plays-cell {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .dropdown-menu {
+    width: 220px; 
+    right: -10px;
+  }
+  
+  .button-text {
+    font-size: 0.9rem;
+  }
 }
 
+/* Smaller tablets and large phones */
+@media (max-width: 640px) {
+  .artists-page {
+    padding: 1.2rem;
+    border-width: 3px;
+    box-shadow: 6px 6px 0px #000;
+  }
+  
+  .title {
+    font-size: 1.6rem;
+  }
+  
+  .artist-name {
+    font-size: 0.95rem;
+  }
+  
+  .artist-image-container {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .back-button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    display: flex;
+  }
+  
+  .page-footer {
+    justify-content: center;
+  }
+  
+  .artists-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.85rem;
+  }
+  
+  .artist-card {
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  .artist-details-grid {
+    padding: 0.75rem;
+  }
+}
+
+/* Small phones */
 @media (max-width: 576px) {
   .artists-page {
     padding: 1rem;
+    border-width: 3px;
+    box-shadow: 5px 5px 0px #000;
   }
 
   .page-info {
     flex-direction: column;
     gap: 0.5rem;
   }
-
-  .artist-info {
-    gap: 0.75rem;
-  }
-
-  .plays-cell {
+  
+  .artists-table-container,
+  .artists-grid {
     display: none;
   }
+  
+  .mobile-artists-list {
+    display: flex;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .title-underline {
+    width: 80px;
+    height: 5px;
+  }
+  
+  .collage-button {
+    padding: 0.4rem 0.8rem;
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  .close-button {
+    width: 36px;
+    height: 36px;
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  .close-icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .back-button {
+    padding: 0.6rem 1rem;
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra small phones */
+@media (max-width: 400px) {
+  .mobile-artist-item {
+    padding: 0.6rem;
+  }
+  
+  .mobile-artist-rank {
+    font-size: 1rem;
+    min-width: 30px;
+  }
+  
+  .mobile-artist-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .dropdown-menu {
+    width: 200px;
+    right: -15px;
+  }
+  
+  .dropdown-content {
+    padding: 0.75rem;
+  }
+  
+  .title {
+    font-size: 1.3rem;
+  }
+  
+  .button-text {
+    font-size: 0.8rem;
+  }
+  
+  .header-actions {
+    gap: 0.5rem;
+  }
+}
+
+.artists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.artist-card {
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0px #000;
+  overflow: hidden;
+  background-color: white;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.artist-card:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
+}
+
+.artist-image-container-grid {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+  overflow: hidden;
+}
+
+.artist-image-container-grid img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artist-rank {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-weight: 800;
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+.artist-details-grid {
+  padding: 1rem;
+}
+
+.artist-title {
+  font-weight: 800;
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist-plays {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.75rem;
 }
 </style>
