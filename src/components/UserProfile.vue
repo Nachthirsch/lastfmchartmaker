@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useUserStore } from "../stores/user";
+import UserShareTrigger from "./UserShareTrigger.vue";
 
 // Props
 const props = defineProps({
@@ -52,6 +53,11 @@ onMounted(async () => {
   <div class="user-profile">
     <div class="profile-header">
       <h2 class="profile-title">User Profile</h2>
+      
+      <!-- Add share button here -->
+      <div class="profile-actions" v-if="userInfo">
+        <UserShareTrigger :username="username" />
+      </div>
     </div>
 
     <div class="profile-content">
@@ -166,6 +172,9 @@ onMounted(async () => {
   background-image: linear-gradient(to right, #ff69b4, #4dd4ac, #9b5de5);
   padding: 1.25rem;
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .profile-title {
@@ -175,6 +184,11 @@ onMounted(async () => {
   text-transform: uppercase;
   color: #000;
   transform: rotate(-1deg);
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .profile-content {
@@ -432,6 +446,16 @@ onMounted(async () => {
 
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .profile-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
+  }
+  
+  .profile-actions {
+    width: 100%;
   }
 }
 </style>
