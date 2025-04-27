@@ -54,62 +54,14 @@
       <div class="info-count">Total: {{ artistsCount }} artists</div>
     </div>
 
-    <!-- Toggle View Buttons -->
-    <div class="view-toggle">
-      <button @click="currentView = 'table'" class="view-button" :class="{ active: currentView === 'table' }">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
-        </svg>
-        Table
-      </button>
-      <button @click="currentView = 'grid'" class="view-button" :class="{ active: currentView === 'grid' }">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
-        </svg>
-        Grid
-      </button>
-    </div>
-
-    <!-- Artists Table View -->
-    <div v-if="currentView === 'table'" class="artists-table-container">
-      <table class="artists-table">
-        <thead>
-          <tr>
-            <th class="rank-column">Rank</th>
-            <th class="artist-column">Artist</th>
-            <th class="plays-column">Plays</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(artist, index) in topArtists" :key="artist.mbid || index" @click="showArtistDetails(artist.name)" class="artist-row">
-            <td class="rank-cell">#{{ index + 1 }}</td>
-            <td class="artist-cell">
-              <div class="artist-info">
-                <div class="artist-image-container">
-                  <img :src="getArtistImage(artist)" :alt="artist.name" class="artist-image" loading="lazy" />
-                  <div class="artist-rank-overlay">{{ index + 1 }}</div>
-                </div>
-                <div class="artist-details">
-                  <div class="artist-name">{{ artist.name }}</div>
-                </div>
-              </div>
-            </td>
-            <td class="plays-cell">
-              {{ formatPlaycount(artist.playcount) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Artists Grid View -->
-    <div v-if="currentView === 'grid'" class="artists-grid">
+    <!-- Artists Grid -->
+    <div class="artists-grid">
       <div v-for="(artist, index) in topArtists" :key="artist.mbid || index" @click="showArtistDetails(artist.name)" class="artist-card">
-        <div class="artist-image-container-grid">
+        <div class="artist-image-container">
           <img :src="getArtistImage(artist)" :alt="artist.name" class="artist-image" loading="lazy" />
           <div class="artist-rank">#{{ index + 1 }}</div>
         </div>
-        <div class="artist-details-grid">
+        <div class="artist-details">
           <h3 class="artist-title">{{ artist.name }}</h3>
           <p class="artist-plays">{{ formatPlaycount(artist.playcount) }} plays</p>
         </div>
@@ -122,10 +74,9 @@
         <div class="mobile-artist-rank">#{{ index + 1 }}</div>
         <div class="mobile-artist-image">
           <img :src="getArtistImage(artist)" :alt="artist.name" loading="lazy" />
-          <div class="mobile-artist-rank-overlay">{{ index + 1 }}</div>
         </div>
         <div class="mobile-artist-info">
-          <div class="mobile-artist-name">{{ artist.name }}</div>
+          <div class="mobile-artist-title">{{ artist.name }}</div>
           <div class="mobile-artist-plays">{{ formatPlaycount(artist.playcount) }} plays</div>
         </div>
       </div>
@@ -167,7 +118,7 @@ const showCollageOptions = ref(false);
 const selectedCollageSize = ref("3x3");
 const collageTheme = ref("dark");
 const showArtistNames = ref(true);
-const currentView = ref("table");
+
 const collageSizes = [
   { value: "3x3", label: "3×3", gridSize: 3, itemCount: 9 },
   { value: "4x4", label: "4×4", gridSize: 4, itemCount: 16 },
@@ -337,7 +288,7 @@ async function createArtistCollage(size) {
 
 .collage-button {
   background-color: #9b5de5;
-  color: white;
+  color: black;
   border: 3px solid #000;
   box-shadow: 4px 4px 0px #000;
   padding: 0.5rem 1rem;
@@ -426,7 +377,7 @@ async function createArtistCollage(size) {
 .size-button.active,
 .theme-button.active {
   background-color: #9b5de5;
-  color: white;
+  color: black;
 }
 
 .theme-options {
@@ -461,7 +412,7 @@ async function createArtistCollage(size) {
 
 .create-button {
   background-color: #9b5de5;
-  color: white;
+  color: black;
   border: 2px solid #000;
   box-shadow: 3px 3px 0px #000;
   padding: 0.5rem;
@@ -488,164 +439,74 @@ async function createArtistCollage(size) {
   gap: 0.5rem;
 }
 
-.view-toggle {
-  display: flex;
-  gap: 0.75rem;
+.artists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
-.view-button {
-  background-color: #f0f0f0;
-  border: 2px solid #000;
-  padding: 0.5rem 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.view-button:hover {
-  background-color: #e0e0e0;
-}
-
-.view-button.active {
-  background-color: #9b5de5;
-  color: white;
-}
-
-.artists-table-container {
+.artist-card {
   border: 3px solid #000;
-  box-shadow: 6px 6px 0px #000;
-  overflow: auto; /* Changed from hidden to auto for horizontal scrolling */
-  margin-bottom: 1.5rem;
-}
-
-.artists-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 500px; /* Ensures table doesn't get too compressed */
-}
-
-.artists-table th {
-  background-color: #f0f0f0;
-  text-align: left;
-  padding: 1rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  border-bottom: 3px solid #000;
-}
-
-.artist-row {
-  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 4px 4px 0px #000;
+  overflow: hidden;
+  background-color: white;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.artist-row:hover {
-  background-color: #f8f8f8;
-}
-
-.artist-row:last-child {
-  border-bottom: none;
-}
-
-.rank-cell {
-  padding: 1rem;
-  font-weight: 800;
-  font-size: 1.2rem;
-  color: #9b5de5;
-  width: 80px;
-}
-
-.artist-cell {
-  padding: 0.75rem 1rem;
-}
-
-.plays-cell {
-  padding: 1rem;
-  font-weight: 600;
-  color: #666;
-  text-align: right;
-}
-
-.artist-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.artist-card:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px #000;
 }
 
 .artist-image-container {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 100%;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
   overflow: hidden;
-  border: 2px solid #000;
-  flex-shrink: 0;
 }
 
 .artist-image {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.artist-rank-overlay {
+.artist-rank {
   position: absolute;
-  top: 4px;
-  left: 4px;
+  top: 8px;
+  left: 8px;
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
   font-weight: 800;
-  padding: 0.2rem 0.4rem;
+  padding: 0.25rem 0.5rem;
   border-radius: 20px;
-  font-size: 0.7rem;
-  z-index: 1;
+  font-size: 0.8rem;
 }
 
 .artist-details {
-  flex-grow: 1;
+  padding: 1rem;
 }
 
-.artist-name {
-  font-weight: 700;
-  margin-bottom: 0.25rem;
+.artist-title {
+  font-weight: 800;
+  margin: 0 0 0.25rem 0;
+  font-size: 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.artist-tags {
-  margin-top: 0.5rem;
+.artist-plays {
+  font-size: 0.85rem;
+  color: #888;
+  margin-bottom: 0.75rem;
 }
 
-.tags-button {
-  background: none;
-  border: none;
-  color: #9b5de5;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-}
-
-.tags-button:hover {
-  color: #7b42b5;
-}
-
-.tags-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.4rem;
-}
-
-.tag {
-  background-color: #9b5de5;
-  color: white;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-/* Mobile Artists List (initially hidden) */
 .mobile-artists-list {
   display: none;
   flex-direction: column;
@@ -683,7 +544,6 @@ async function createArtistCollage(size) {
   overflow: hidden;
   border: 1px solid #000;
   flex-shrink: 0;
-  position: relative;
 }
 
 .mobile-artist-image img {
@@ -692,25 +552,12 @@ async function createArtistCollage(size) {
   object-fit: cover;
 }
 
-.mobile-artist-rank-overlay {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  font-weight: 800;
-  padding: 0.2rem 0.4rem;
-  border-radius: 20px;
-  font-size: 0.7rem;
-  z-index: 1;
-}
-
 .mobile-artist-info {
   flex: 1;
   min-width: 0;
 }
 
-.mobile-artist-name {
+.mobile-artist-title {
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -720,10 +567,9 @@ async function createArtistCollage(size) {
 .mobile-artist-plays {
   font-size: 0.9rem;
   color: #666;
-}
-
-.mobile-artist-tags {
-  margin-top: 0.5rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .page-footer {
@@ -734,7 +580,7 @@ async function createArtistCollage(size) {
 
 .back-button {
   background-color: #9b5de5;
-  color: white;
+  color: black;
   border: 3px solid #000;
   box-shadow: 4px 4px 0px #000;
   padding: 0.75rem 1.25rem;
@@ -753,22 +599,17 @@ async function createArtistCollage(size) {
 
 /* Large tablets and small desktops */
 @media (max-width: 1024px) {
+  .artists-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+  }
+  
+  .artist-details {
+    padding: 0.85rem;
+  }
+  
   .title {
     font-size: 1.8rem;
-  }
-  
-  .artist-image-container {
-    width: 55px;
-    height: 55px;
-  }
-  
-  .artists-table th {
-    padding: 0.9rem;
-  }
-  
-  .rank-cell {
-    padding: 0.9rem;
-    font-size: 1.1rem;
   }
 }
 
@@ -782,7 +623,7 @@ async function createArtistCollage(size) {
   .header-actions {
     align-self: flex-end;
   }
-  
+
   .artists-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 1rem;
@@ -792,28 +633,8 @@ async function createArtistCollage(size) {
     font-size: 0.95rem;
   }
   
-  .artist-image-container {
-    width: 50px;
-    height: 50px;
-  }
-
-  .rank-cell {
-    width: 60px;
-    padding: 0.75rem;
-  }
-  
-  .artists-table th {
-    padding: 0.75rem;
-    font-size: 0.9rem;
-  }
-  
-  .artist-cell {
-    padding: 0.6rem 0.75rem;
-  }
-  
-  .plays-cell {
-    padding: 0.75rem;
-    font-size: 0.9rem;
+  .artist-plays {
+    font-size: 0.85rem;
   }
   
   .dropdown-menu {
@@ -834,17 +655,22 @@ async function createArtistCollage(size) {
     box-shadow: 6px 6px 0px #000;
   }
   
+  .artists-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.85rem;
+  }
+  
+  .artist-card {
+    border-width: 2px;
+    box-shadow: 3px 3px 0px #000;
+  }
+  
+  .artist-details {
+    padding: 0.75rem;
+  }
+  
   .title {
     font-size: 1.6rem;
-  }
-  
-  .artist-name {
-    font-size: 0.95rem;
-  }
-  
-  .artist-image-container {
-    width: 45px;
-    height: 45px;
   }
   
   .back-button {
@@ -856,20 +682,6 @@ async function createArtistCollage(size) {
   
   .page-footer {
     justify-content: center;
-  }
-  
-  .artists-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 0.85rem;
-  }
-  
-  .artist-card {
-    border-width: 2px;
-    box-shadow: 3px 3px 0px #000;
-  }
-  
-  .artist-details-grid {
-    padding: 0.75rem;
   }
 }
 
@@ -885,12 +697,11 @@ async function createArtistCollage(size) {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
-  .artists-table-container,
+
   .artists-grid {
     display: none;
   }
-  
+
   .mobile-artists-list {
     display: flex;
   }
@@ -966,73 +777,5 @@ async function createArtistCollage(size) {
   .header-actions {
     gap: 0.5rem;
   }
-}
-
-.artists-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.artist-card {
-  border: 3px solid #000;
-  box-shadow: 4px 4px 0px #000;
-  overflow: hidden;
-  background-color: white;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.artist-card:hover {
-  transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0px #000;
-}
-
-.artist-image-container-grid {
-  position: relative;
-  width: 100%;
-  padding-top: 100%; /* 1:1 Aspect Ratio */
-  overflow: hidden;
-}
-
-.artist-image-container-grid img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.artist-rank {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  font-weight: 800;
-  padding: 0.25rem 0.5rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-}
-
-.artist-details-grid {
-  padding: 1rem;
-}
-
-.artist-title {
-  font-weight: 800;
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.artist-plays {
-  font-size: 0.85rem;
-  color: #888;
-  margin-bottom: 0.75rem;
 }
 </style>
