@@ -182,8 +182,8 @@ export const useArtistsStore = defineStore("artists", {
           console.log(`[STORE] Fetched ${this.topArtists.length} top artists`);
 
           // After getting top artists, fetch detailed info and Spotify images
-          await this.fetchDetailedInfoForTopArtists(12);
-          await this.fetchSpotifyImagesForTopArtists(12);
+          await this.fetchDetailedInfoForTopArtists(25);
+          await this.fetchSpotifyImagesForTopArtists(25);
         } else {
           throw new Error("Invalid response format");
         }
