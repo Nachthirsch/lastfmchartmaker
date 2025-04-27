@@ -412,7 +412,7 @@ onMounted(() => {
           <span class="w-5 h-5 bg-red-600 border-2 border-black"></span>
           <span class="w-5 h-5 bg-red-700 border-2 border-black transform rotate-[-10deg]"></span>
         </div>
-        <p class="font-bold mb-2">Powered by <a href="https://www.last.fm/api" target="_blank" class="text-red-500 hover:underline hover:text-red-400 transition-colors">Last.fm API</a> | Built with Vue 3, Pinia, and Tailwind CSS</p>
+        <p class="font-bold mb-2">Powered by <a href="https://www.last.fm/api" target="_blank" class="text-red-500 hover:underline hover:text-red-400 transition-colors">Last.fm API</a> and <a href="https://www.spotify.com/" target="_blank" class="text-green-500 hover:underline hover:text-greeb-400 transition-colors">Spotify API</a> | Built with Vue 3, Pinia, and Tailwind CSS</p>
         <p class="font-bold">Made with <span class="text-red-500 text-xl relative top-0.5">❤️</span> by <a href="https://github.com/nachthirsch" target="_blank" class="text-red-500 hover:underline hover:text-red-400 transition-colors">yuunaagi</a></p>
       </footer>
     </div>
