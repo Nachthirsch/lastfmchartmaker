@@ -148,13 +148,117 @@ async function generateImage() {
     // Ensure component is fully rendered before capturing
     await nextTick();
     
-    const dataUrl = await toPng(shareCardRef.value, {
+    // FIXED DIMENSIONS for the share image (regardless of device)
+    const FIXED_WIDTH = 400;  // Fixed width in pixels
+    const ASPECT_RATIO = 9/16; // Fixed aspect ratio (9:16 portrait - width/height)
+    const FIXED_HEIGHT = Math.round(FIXED_WIDTH / ASPECT_RATIO); // Calculate fixed height
+    
+    // Create a temporary container with fixed dimensions
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'fixed';
+    tempContainer.style.top = '-9999px';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.width = `${FIXED_WIDTH}px`;
+    tempContainer.style.height = `${FIXED_HEIGHT}px`;
+    tempContainer.style.overflow = 'hidden';
+    tempContainer.style.backgroundColor = '#1A1A1A';
+    document.body.appendChild(tempContainer);
+    
+    // Clone the card content for rendering at fixed size
+    const cardClone = shareCardRef.value.cloneNode(true);
+    
+    // Reset all responsive styling to ensure consistent output
+    cardClone.style.width = `${FIXED_WIDTH}px`;
+    cardClone.style.height = `${FIXED_HEIGHT}px`;
+    cardClone.style.maxWidth = 'none';
+    cardClone.style.maxHeight = 'none';
+    cardClone.style.minHeight = 'none';
+    cardClone.style.boxShadow = 'none';
+    cardClone.style.margin = '0';
+    cardClone.style.border = '3px solid #000';
+    cardClone.style.overflow = 'hidden';
+    cardClone.style.position = 'relative';
+    
+    // Apply fixed dimensions to all child elements to ensure consistency
+    const contentSection = cardClone.querySelector('.share-card-content');
+    if (contentSection) {
+      contentSection.style.height = '100%';
+      
+      // Apply fixed sizing to sub-sections
+      const userSection = contentSection.querySelector('.user-section');
+      if (userSection) {
+        userSection.style.padding = '20px';
+      }
+      
+      const profileImage = contentSection.querySelector('.profile-image-container');
+      if (profileImage) {
+        profileImage.style.width = '80px';
+        profileImage.style.height = '80px';
+      }
+      
+      // Reset font sizes to fixed values
+      const username = contentSection.querySelector('.username');
+      if (username) {
+        username.style.fontSize = '22px';
+      }
+      
+      const playCount = contentSection.querySelector('.play-count');
+      if (playCount) {
+        playCount.style.fontSize = '14px';
+        playCount.style.padding = '3px 8px';
+      }
+      
+      // Adjust stat sections for fixed output
+      const statRows = contentSection.querySelectorAll('.stat-row');
+      statRows.forEach(row => {
+        row.style.padding = '15px';
+        
+        const rankLabel = row.querySelector('.rank-label');
+        if (rankLabel) {
+          rankLabel.style.fontSize = '14px';
+          rankLabel.style.padding = '5px 10px';
+        }
+        
+        const statCover = row.querySelector('.stat-cover');
+        if (statCover) {
+          statCover.style.width = '70px';
+          statCover.style.height = '70px';
+        }
+        
+        const itemName = row.querySelector('.item-name');
+        if (itemName) {
+          itemName.style.fontSize = '16px';
+        }
+        
+        const itemArtist = row.querySelector('.item-artist');
+        if (itemArtist) {
+          itemArtist.style.fontSize = '14px';
+        }
+        
+        const itemPlays = row.querySelector('.item-plays');
+        if (itemPlays) {
+          itemPlays.style.fontSize = '14px';
+        }
+      });
+    }
+    
+    // Add the clone to the temporary container
+    tempContainer.appendChild(cardClone);
+    
+    // Wait for rendering
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    // Generate image with FIXED dimensions
+    const dataUrl = await toPng(cardClone, {
       quality: 0.95,
       pixelRatio: 3,
+      width: FIXED_WIDTH,
+      height: FIXED_HEIGHT,
+      cacheBust: true,
+      canvasWidth: FIXED_WIDTH,
+      canvasHeight: FIXED_HEIGHT,
       style: {
-        // Ensure proper rendering
-        transform: 'scale(1)',
-        transformOrigin: 'top left',
+        transform: 'none',
       }
     });
     
@@ -164,6 +268,8 @@ async function generateImage() {
     link.href = dataUrl;
     link.click();
     
+    // Clean up
+    document.body.removeChild(tempContainer);
     generatingImage.value = false;
   } catch (err) {
     console.error("Error generating image:", err);
@@ -185,6 +291,10 @@ onMounted(async () => {
 
 <template>
   <div class="share-card-container">
+    <div class="fixed-size-info">
+      <p>Preview (Output will be 400x711px)</p>
+    </div>
+    
     <div class="controls">
       <button 
         @click="generateImage" 
@@ -327,14 +437,31 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
   width: 100%;
   margin: 0 auto;
   font-family: 'Inter', 'Arial', sans-serif;
+  padding: 0 5px; /* Reduced padding for small screens */
+}
+
+.fixed-size-info {
+  background-color: #333;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 5px;
+  border: 2px solid #000;
+}
+
+.fixed-size-info p {
+  margin: 0;
+  font-weight: 600;
 }
 
 .controls {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -373,12 +500,32 @@ onMounted(async () => {
 /* Share card */
 .share-card {
   width: 100%;
-  max-width: 400px; /* Adjust as needed for your layout */
-  aspect-ratio: 9/16;
+  max-width: 340px; /* Reduced maximum width for better mobile fit */
+  /* Define mobile-friendly dimensions */
+  height: auto;
+  min-height: 450px; /* Slightly reduced minimum height */
+  max-height: 75vh; /* Reduced maximum height to prevent overflow */
   background-color: #1A1A1A;
   overflow: hidden;
-  box-shadow: 10px 10px 0px #000;
+  box-shadow: 5px 5px 0px #000; /* Smaller shadow for mobile */
   border: 3px solid #000;
+  margin: 0 auto; /* Center the card */
+}
+
+/* Apply responsive styles for very small screens */
+@media screen and (max-width: 400px) {
+  .share-card {
+    max-width: 280px; /* Even smaller for very small screens */
+    box-shadow: 3px 3px 0px #000;
+    min-height: auto; /* Remove min-height on very small screens */
+    border: 2px solid #000; /* Thinner border on mobile */
+  }
+  
+  .generate-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-width: 2px; /* Thinner border on button for mobile */
+  }
 }
 
 .share-card-content {
@@ -395,15 +542,16 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   height: 100%;
+  min-height: 300px; /* Ensure minimum height for loading state */
   background-color: #1A1A1A;
   color: #FFFFFF;
 }
 
 .loader {
-  width: 50px;
-  height: 50px;
-  border: 5px solid #333;
-  border-top: 5px solid #666;
+  width: 40px; /* Smaller loader for mobile */
+  height: 40px;
+  border: 4px solid #333;
+  border-top: 4px solid #666;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
@@ -417,9 +565,9 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 60px;
-  height: 60px;
-  font-size: 40px;
+  width: 50px; /* Smaller error icon for mobile */
+  height: 50px;
+  font-size: 30px;
   font-weight: bold;
   color: #000;
   background-color: #666;
@@ -430,14 +578,14 @@ onMounted(async () => {
 /* Header section */
 .header-section {
   background-color: #333;
-  padding: 10px;
+  padding: 8px; /* Reduced padding */
   text-align: center;
   border-bottom: 3px solid #000;
 }
 
 .header-text {
   margin: 0;
-  font-size: 18px;
+  font-size: 16px; /* Smaller font size */
   font-weight: 900;
   color: white;
   letter-spacing: 1px;
@@ -446,22 +594,49 @@ onMounted(async () => {
 /* User section */
 .user-section {
   background-color: #252525;
-  padding: 20px;
+  padding: 15px; /* Reduced padding */
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 12px; /* Reduced gap */
   border-bottom: 3px solid #000;
 }
 
 .profile-image-container {
-  width: 80px;
-  height: 80px;
+  width: 70px; /* Smaller profile image */
+  height: 70px;
   background-color: #333;
   border: 3px solid #000;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
+
+/* Responsive adjustments for smaller screens */
+@media screen and (max-width: 320px) {
+  .user-section {
+    padding: 12px 8px;
+  }
+  
+  .profile-image-container {
+    width: 50px; /* Much smaller profile image */
+    height: 50px;
+    border-width: 2px;
+  }
+  
+  .username {
+    font-size: 16px;
+  }
+  
+  .play-count {
+    font-size: 12px;
+    padding: 2px 5px;
+    border-width: 1px;
+  }
+  
+  .header-text {
+    font-size: 14px;
+  }
 }
 
 .profile-image {
@@ -476,38 +651,42 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36px;
+  font-size: 30px; /* Smaller font size */
   font-weight: 800;
   color: #e0e0e0;
 }
 
 .user-details {
   flex-grow: 1;
+  overflow: hidden; /* Prevent overflow */
 }
 
 .username {
-  font-size: 24px;
+  font-size: 20px; /* Smaller font size */
   font-weight: 900;
   color: #FFF;
   text-transform: uppercase;
   margin-bottom: 5px;
   line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .play-count {
-  font-size: 16px;
+  font-size: 14px; /* Smaller font size */
   font-weight: 800;
   color: #000;
   background-color: #e0e0e0;
   display: inline-block;
-  padding: 3px 8px;
+  padding: 2px 6px; /* Reduced padding */
   border: 2px solid #000;
 }
 
 /* Period section */
 .period-section {
   background-color: #2A2A2A;
-  padding: 12px 15px;
+  padding: 10px 12px; /* Reduced padding */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -515,21 +694,37 @@ onMounted(async () => {
 }
 
 .period-label {
-  font-size: 16px;
+  font-size: 14px; /* Smaller font size */
   font-weight: 800;
   color: #e0e0e0;
   text-transform: uppercase;
 }
 
 .period-value {
-  font-size: 16px;
+  font-size: 14px; /* Smaller font size */
   font-weight: 800;
   color: #000000;
   background-color: #f52d37;
   display: inline-block;
-  padding: 4px 12px;
+  padding: 3px 8px; /* Reduced padding */
   border: 2px solid #000;
   text-transform: uppercase;
+}
+
+/* Smaller text for tight spaces */
+@media screen and (max-width: 320px) {
+  .period-label, .period-value {
+    font-size: 12px;
+  }
+  
+  .period-value {
+    padding: 2px 5px;
+    border-width: 1px;
+  }
+  
+  .period-section {
+    padding: 8px 10px;
+  }
 }
 
 /* Stats sections */
@@ -543,32 +738,56 @@ onMounted(async () => {
 .stat-row {
   display: flex;
   flex-direction: column;
-  padding: 15px;
-  border-bottom: 3px solid #000;
+  padding: 12px; /* Reduced padding */
+  border-bottom: 2px solid #000; /* Thinner border */
+}
+
+/* Responsive adjustments for stat rows on small screens */
+@media screen and (max-width: 320px) {
+  .stat-row {
+    padding: 8px;
+  }
+  
+  .rank-label {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-width: 1px;
+    margin-bottom: 6px;
+  }
+  
+  .stat-cover {
+    width: 40px;
+    height: 40px;
+    border-width: 1px;
+  }
+  
+  .stat-content {
+    gap: 8px;
+  }
 }
 
 .rank-label {
-  font-size: 14px;
+  font-size: 12px; /* Smaller font size */
   font-weight: 800;
   color: #e0e0e0;
   background-color: #333;
   display: inline-block;
-  padding: 5px 10px;
-  margin-bottom: 10px;
+  padding: 4px 8px; /* Reduced padding */
+  margin-bottom: 8px; /* Reduced margin */
   border: 2px solid #000;
   text-transform: uppercase;
 }
 
 .stat-content {
   display: flex;
-  gap: 15px;
+  gap: 12px; /* Reduced gap */
 }
 
 .stat-cover {
-  width: 70px;
-  height: 70px;
+  width: 60px; /* Smaller cover */
+  height: 60px;
   background-color: #2A2A2A;
-  border: 3px solid #000;
+  border: 2px solid #000; /* Thinner border */
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -587,7 +806,7 @@ onMounted(async () => {
   justify-content: center;
   background-color: #333;
   color: #e0e0e0;
-  font-size: 28px;
+  font-size: 24px; /* Smaller font size */
   font-weight: 800;
 }
 
@@ -596,16 +815,17 @@ onMounted(async () => {
   flex-direction: column;
   justify-content: center;
   background-color: #2A2A2A;
-  border: 3px solid #000;
-  padding: 8px 12px;
+  border: 2px solid #000; /* Thinner border */
+  padding: 6px 10px; /* Reduced padding */
   flex-grow: 1;
+  overflow: hidden; /* Prevent overflow */
 }
 
 .item-name {
-  font-size: 16px;
+  font-size: 14px; /* Smaller font size */
   font-weight: 800;
   color: #FFF;
-  margin-bottom: 2px;
+  margin-bottom: 1px; /* Reduced margin */
   line-height: 1.2;
   overflow: hidden;
   display: -webkit-box;
@@ -614,10 +834,10 @@ onMounted(async () => {
 }
 
 .item-artist {
-  font-size: 14px;
+  font-size: 12px; /* Smaller font size */
   font-weight: 600;
   color: #a0a0a0;
-  margin-bottom: 2px;
+  margin-bottom: 1px; /* Reduced margin */
   line-height: 1.2;
   overflow: hidden;
   display: -webkit-box;
@@ -627,14 +847,29 @@ onMounted(async () => {
 }
 
 .item-plays {
-  font-size: 14px;
+  font-size: 12px; /* Smaller font size */
   font-weight: 700;
   color: #e0e0e0;
 }
 
+/* Responsive adjustments for text on small screens */
+@media screen and (max-width: 320px) {
+  .item-name {
+    font-size: 12px;
+  }
+  
+  .item-artist {
+    font-size: 10px;
+  }
+  
+  .item-plays {
+    font-size: 10px;
+  }
+}
+
 /* Footer section */
 .footer-section {
-  padding: 15px;
+  padding: 12px; /* Reduced padding */
   text-align: center;
   background-color: #333;
   margin-top: auto;
@@ -643,7 +878,7 @@ onMounted(async () => {
 .credit {
   margin: 0;
   font-weight: 800;
-  font-size: 14px;
+  font-size: 12px; /* Smaller font size */
   letter-spacing: 1px;
   color: white;
 }

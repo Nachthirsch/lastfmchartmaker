@@ -61,6 +61,10 @@ function toggleShareCard() {
           </select>
         </div>
         
+        <div class="fixed-size-note">
+          <span>Note:</span> The generated image will be 400x711px regardless of device size
+        </div>
+        
         <div class="modal-body">
           <ShareCard :username="username" :period="selectedPeriod" />
         </div>
@@ -106,8 +110,9 @@ function toggleShareCard() {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  padding: 20px;
+  padding: 10px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .modal-content {
@@ -117,9 +122,10 @@ function toggleShareCard() {
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
+  position: relative;
+  overflow: hidden; /* Hide any overflowing content */
 }
 
 .modal-header {
@@ -185,12 +191,68 @@ label {
 .modal-body {
   padding: 20px;
   overflow-y: auto;
+  height: 100%;
+  display: flex;
+  justify-content: center;
 }
 
+/* Fixed size info */
+.fixed-size-note {
+  text-align: center;
+  padding: 8px 0;
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #ddd;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.fixed-size-note span {
+  font-weight: bold;
+}
+
+/* Enhanced mobile responsiveness */
 @media (max-width: 768px) {
   .modal-content {
     max-width: 100%;
-    height: 90vh;
+    height: auto;
+    max-height: 95vh;
+    margin: 0;
+    box-shadow: none;
+  }
+  
+  .share-modal {
+    padding: 0;
+    align-items: center;
+  }
+  
+  .modal-body {
+    padding: 10px 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-header {
+    padding: 10px 15px;
+  }
+  
+  .modal-title {
+    font-size: 1rem;
+  }
+  
+  .time-period-selection {
+    padding: 10px 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .period-select {
+    width: 100%;
+  }
+  
+  .close-button {
+    width: 28px;
+    height: 28px;
   }
 }
 </style> 
