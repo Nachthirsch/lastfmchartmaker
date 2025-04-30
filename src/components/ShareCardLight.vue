@@ -175,20 +175,38 @@ async function generateImage() {
     cardClone.style.minHeight = 'none';
     cardClone.style.boxShadow = 'none';
     cardClone.style.margin = '0';
-    cardClone.style.border = '1px solid #eee';
+    cardClone.style.border = '1px solid #e0e0e0';
+    cardClone.style.borderLeft = '5px solid #ff5252';
     cardClone.style.overflow = 'hidden';
     cardClone.style.position = 'relative';
     cardClone.style.borderRadius = '0'; // Ensure sharp borders in the final image
+    
+    // Add subtle background pattern
+    const bgPattern = document.createElement('div');
+    bgPattern.style.position = 'absolute';
+    bgPattern.style.top = '0';
+    bgPattern.style.left = '0';
+    bgPattern.style.width = '100%';
+    bgPattern.style.height = '100%';
+    bgPattern.style.opacity = '0.03';
+    bgPattern.style.backgroundImage = 'radial-gradient(#000 1px, transparent 1px)';
+    bgPattern.style.backgroundSize = '20px 20px';
+    bgPattern.style.pointerEvents = 'none';
+    bgPattern.style.zIndex = '1';
+    cardClone.appendChild(bgPattern);
     
     // Apply fixed dimensions to all child elements to ensure consistency
     const contentSection = cardClone.querySelector('.share-card-content');
     if (contentSection) {
       contentSection.style.height = '100%';
+      contentSection.style.position = 'relative';
+      contentSection.style.zIndex = '2';
       
       // Apply fixed sizing to sub-sections
       const userSection = contentSection.querySelector('.user-section');
       if (userSection) {
         userSection.style.padding = '30px 20px';
+        userSection.style.background = 'linear-gradient(to right, #ffffff, #f8f8f8)';
       }
       
       const profileImage = contentSection.querySelector('.profile-image-container');
@@ -196,27 +214,53 @@ async function generateImage() {
         profileImage.style.width = '80px';
         profileImage.style.height = '80px';
         profileImage.style.borderRadius = '0'; // Ensure sharp borders for profile image
+        profileImage.style.boxShadow = '0 4px 10px rgba(0,0,0,0.1)';
+        profileImage.style.border = '1px solid #e0e0e0';
       }
       
       // Reset font sizes to fixed values
       const username = contentSection.querySelector('.username');
       if (username) {
         username.style.fontSize = '22px';
+        username.style.letterSpacing = '0.5px';
+        username.style.color = '#222';
       }
       
       const playCount = contentSection.querySelector('.play-count');
       if (playCount) {
         playCount.style.fontSize = '14px';
+        playCount.style.padding = '3px 10px';
+        playCount.style.background = '#f5f5f5';
+        playCount.style.borderLeft = '3px solid #ff5252';
+        playCount.style.boxShadow = '2px 2px 0 rgba(0,0,0,0.05)';
+      }
+      
+      // Enhance the period section
+      const periodSection = contentSection.querySelector('.period-section');
+      if (periodSection) {
+        periodSection.style.background = 'linear-gradient(to right, #f8f8f8, #f0f0f0)';
+        periodSection.style.padding = '15px 20px';
+        
+        const periodValue = periodSection.querySelector('.period-value');
+        if (periodValue) {
+          periodValue.style.borderBottom = '1px solid rgba(255,82,82,0.5)';
+        }
       }
       
       // Adjust stat sections for fixed output
       const statRows = contentSection.querySelectorAll('.stat-row');
-      statRows.forEach(row => {
-        row.style.padding = '15px';
+      statRows.forEach((row, index) => {
+        row.style.padding = '20px';
+        // Alternate background color for rows
+        row.style.background = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
+        row.style.borderBottom = '1px solid #eeeeee';
         
         const rankLabel = row.querySelector('.rank-label');
         if (rankLabel) {
           rankLabel.style.fontSize = '14px';
+          rankLabel.style.padding = '4px 12px';
+          rankLabel.style.background = 'linear-gradient(to right, #f0f0f0, #e8e8e8)';
+          rankLabel.style.boxShadow = '2px 2px 0 rgba(0,0,0,0.05)';
         }
         
         const statCover = row.querySelector('.stat-cover');
@@ -224,31 +268,51 @@ async function generateImage() {
           statCover.style.width = '70px';
           statCover.style.height = '70px';
           statCover.style.borderRadius = '0'; // Ensure sharp borders for covers
+          statCover.style.boxShadow = '0 4px 10px rgba(0,0,0,0.1)';
+          statCover.style.border = '1px solid #e0e0e0';
+        }
+        
+        const statInfo = row.querySelector('.stat-info');
+        if (statInfo) {
+          statInfo.style.paddingLeft = '12px';
         }
         
         const itemName = row.querySelector('.item-name');
         if (itemName) {
           itemName.style.fontSize = '16px';
+          itemName.style.fontWeight = '700';
+          itemName.style.color = '#222';
         }
         
         const itemArtist = row.querySelector('.item-artist');
         if (itemArtist) {
           itemArtist.style.fontSize = '14px';
+          itemArtist.style.color = '#555';
         }
         
         const itemPlays = row.querySelector('.item-plays');
         if (itemPlays) {
-          itemPlays.style.fontSize = '14px';
+          itemPlays.style.fontSize = '13px';
+          itemPlays.style.padding = '2px 8px';
+          itemPlays.style.background = '#f5f5f5';
+          itemPlays.style.borderLeft = '2px solid #ff5252';
+          itemPlays.style.display = 'inline-block';
+          itemPlays.style.marginTop = '5px';
         }
       });
       
-      // Ensure watermark has consistent styling
+      // Enhance watermark styling
       const watermark = contentSection.querySelector('.watermark-section');
       if (watermark) {
-        watermark.style.padding = '10px';
+        watermark.style.padding = '15px';
+        watermark.style.background = 'linear-gradient(to right, #f8f8f8, #f0f0f0)';
+        
         const watermarkUrl = watermark.querySelector('.watermark-url');
         if (watermarkUrl) {
-          watermarkUrl.style.fontSize = '12px';
+          watermarkUrl.style.fontSize = '13px';
+          watermarkUrl.style.letterSpacing = '1.5px';
+          watermarkUrl.style.fontWeight = '500';
+          watermarkUrl.style.color = '#888';
         }
       }
     }
@@ -524,10 +588,25 @@ onMounted(async () => {
   max-height: 75vh;
   background-color: #ffffff;
   overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   border-radius: 0;
   margin: 0 auto;
-  border-left: 4px solid #ff5252;
+  border-left: 5px solid #ff5252;
+  position: relative;
+}
+
+/* Add subtle background pattern */
+.share-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.03;
+  background-image: radial-gradient(#000 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
 }
 
 /* Apply responsive styles for very small screens */
@@ -593,7 +672,7 @@ onMounted(async () => {
 
 /* User section */
 .user-section {
-  background-color: #ffffff;
+  background: linear-gradient(to right, #ffffff, #f8f8f8);
   padding: 30px 20px;
   display: flex;
   align-items: center;
@@ -612,8 +691,8 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #eee;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
 }
 
 /* Responsive adjustments for smaller screens */
@@ -666,13 +745,13 @@ onMounted(async () => {
 .username {
   font-size: 22px;
   font-weight: 600;
-  color: #333;
+  color: #222;
   margin-bottom: 6px;
   line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
 }
 
 .play-count {
@@ -680,15 +759,16 @@ onMounted(async () => {
   font-weight: 400;
   color: #666;
   display: inline-block;
-  padding: 2px 8px;
+  padding: 3px 10px;
   background-color: #f5f5f5;
-  border-left: 2px solid #ff5252;
+  border-left: 3px solid #ff5252;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 /* Period section */
 .period-section {
-  background-color: #fafafa;
-  padding: 14px 20px;
+  background: linear-gradient(to right, #f8f8f8, #f0f0f0);
+  padding: 15px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -709,7 +789,7 @@ onMounted(async () => {
   color: #ff5252;
   letter-spacing: 0.5px;
   padding: 2px 0;
-  border-bottom: 1px solid rgba(255, 82, 82, 0.3);
+  border-bottom: 1px solid rgba(255, 82, 82, 0.5);
 }
 
 /* Smaller text for tight spaces */
@@ -734,50 +814,18 @@ onMounted(async () => {
 .stat-row {
   display: flex;
   flex-direction: column;
-  padding: 18px 20px;
+  padding: 20px;
   border-bottom: 1px solid #eee;
   transition: background-color 0.2s;
   position: relative;
 }
 
-.stat-row::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 3px;
-  background-color: transparent;
-  transition: background-color 0.2s;
+.stat-row:nth-child(odd) {
+  background-color: #ffffff;
 }
 
-.stat-row:hover {
+.stat-row:nth-child(even) {
   background-color: #f9f9f9;
-}
-
-.stat-row:hover::before {
-  background-color: #ff5252;
-}
-
-/* Responsive adjustments for stat rows on small screens */
-@media screen and (max-width: 320px) {
-  .stat-row {
-    padding: 12px;
-  }
-  
-  .rank-label {
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-  
-  .stat-cover {
-    width: 42px;
-    height: 42px;
-  }
-  
-  .stat-content {
-    gap: 10px;
-  }
 }
 
 .rank-label {
@@ -789,8 +837,9 @@ onMounted(async () => {
   text-transform: uppercase;
   position: relative;
   display: inline-block;
-  padding: 3px 10px;
-  background-color: #f5f5f5;
+  padding: 4px 12px;
+  background: linear-gradient(to right, #f0f0f0, #e8e8e8);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
 .stat-content {
@@ -805,8 +854,8 @@ onMounted(async () => {
   border-radius: 0;
   overflow: hidden;
   flex-shrink: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  border: 1px solid #eee;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
 }
 
 .stat-cover img {
@@ -831,15 +880,15 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 4px 0;
+  padding: 4px 0 4px 12px;
   flex-grow: 1;
   overflow: hidden;
 }
 
 .item-name {
   font-size: 16px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #222;
   margin-bottom: 2px;
   line-height: 1.2;
   overflow: hidden;
@@ -852,7 +901,7 @@ onMounted(async () => {
 .item-artist {
   font-size: 14px;
   font-weight: 400;
-  color: #666;
+  color: #555;
   margin-bottom: 4px;
   line-height: 1.2;
   overflow: hidden;
@@ -862,13 +911,14 @@ onMounted(async () => {
 }
 
 .item-plays {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 400;
-  color: #999;
+  color: #888;
   display: inline-block;
-  padding: 1px 6px;
+  padding: 2px 8px;
   background-color: #f5f5f5;
-  border-left: 1px solid #ff5252;
+  border-left: 2px solid #ff5252;
+  margin-top: 5px;
 }
 
 /* Responsive adjustments for text on small screens */
@@ -888,30 +938,19 @@ onMounted(async () => {
 
 /* Watermark section */
 .watermark-section {
-  padding: 12px;
+  padding: 15px;
   text-align: center;
-  background-color: #fafafa;
+  background: linear-gradient(to right, #f8f8f8, #f0f0f0);
   border-top: 1px solid #eee;
   position: relative;
 }
 
-.watermark-section::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #ff5252, transparent);
-  opacity: 0.4;
-}
-
 .watermark-url {
   margin: 0;
-  font-weight: 400;
-  font-size: 12px;
-  color: #999;
-  letter-spacing: 1px;
+  font-weight: 500;
+  font-size: 13px;
+  color: #888;
+  letter-spacing: 1.5px;
   text-transform: lowercase;
 }
 </style> 
