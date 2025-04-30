@@ -199,72 +199,62 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-black text-white font-sans">
-    <!-- Full screen header section -->
-    <div class="relative h-screen flex flex-col justify-center items-center overflow-hidden bg-gradient-to-b from-black to-gray-900">
-      <!-- Animated background elements -->
-      <div class="absolute inset-0 overflow-hidden opacity-20">
-        <div class="absolute top-0 left-0 w-full h-full">
-          <div class="absolute w-20 h-20 rounded-full bg-red-500 animate-pulse" style="top: 10%; left: 15%; animation-delay: 0s"></div>
-          <div class="absolute w-32 h-32 rounded-full bg-red-700 animate-pulse" style="top: 60%; left: 75%; animation-delay: 0.5s"></div>
-          <div class="absolute w-24 h-24 rounded-full bg-red-600 animate-pulse" style="top: 25%; left: 60%; animation-delay: 1s"></div>
-          <div class="absolute w-16 h-16 rounded-full bg-red-800 animate-pulse" style="top: 70%; left: 30%; animation-delay: 1.5s"></div>
-          <div class="absolute w-28 h-28 rounded-full bg-red-900 animate-pulse" style="top: 40%; left: 40%; animation-delay: 2s"></div>
-        </div>
-
-        <!-- Music notes floating animation -->
-        <div class="absolute top-0 left-1/4 animate-float" style="animation-duration: 15s">
-          <svg class="w-12 h-12 text-red-500 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
-          </svg>
-        </div>
-        <div class="absolute top-1/4 right-1/4 animate-float" style="animation-duration: 12s; animation-delay: 2s">
-          <svg class="w-10 h-10 text-red-600 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
-          </svg>
-        </div>
-        <div class="absolute bottom-1/3 left-1/3 animate-float" style="animation-duration: 18s; animation-delay: 1s">
-          <svg class="w-14 h-14 text-red-700 opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
-          </svg>
-        </div>
+    <!-- Simplified minimalist header section -->
+    <div class="relative h-screen flex flex-col justify-center items-center bg-black">
+      <!-- Clean, minimalist background with subtle accent -->
+      <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-800 via-red-600 to-red-500"></div>
+        <div class="absolute bottom-0 right-0 w-full h-1 bg-gradient-to-r from-red-500 via-red-600 to-red-800"></div>
       </div>
 
-      <!-- Central content -->
-      <div class="z-10 text-center px-4 max-w-4xl mx-auto">
-        <!-- Logo/Icon with glow effect -->
-        <div class="flex justify-center mb-8">
-          <div class="relative">
-            <div class="absolute inset-0 blur-xl bg-gradient-to-r from-red-700 via-red-600 to-red-500 opacity-70 scale-150"></div>
-            <svg class="w-24 h-24 text-white relative z-10 transform rotate-[-5deg]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
-            </svg>
-          </div>
+      <!-- Centered content with minimal styling -->
+      <div class="z-10 text-center px-4 max-w-2xl mx-auto">
+        <!-- Simple, clean logo -->
+        <div class="flex justify-center mb-6">
+          <svg class="w-16 h-16 text-red-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.952 1.651a.75.75 0 0 1 .298.599V16.303a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.403-4.909l2.311-.66a1.5 1.5 0 0 0 1.088-1.442V6.994l-9 2.572v9.737a3 3 0 0 1-2.176 2.884l-1.32.377a2.553 2.553 0 1 1-1.402-4.909l2.31-.66a1.5 1.5 0 0 0 1.088-1.442V5.25a.75.75 0 0 1 .544-.721l10.5-3a.75.75 0 0 1 .658.122Z" />
+          </svg>
         </div>
 
-        <!-- Main title with larger size and better gradient -->
-        <h1 class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-800 via-red-600 to-red-500 mb-6 tracking-wide leading-tight transform -rotate-1">LAST SONGS</h1>
+        <!-- Clean typography with minimal styling -->
+        <h1 class="text-6xl font-bold mb-4">LAST SONGS</h1>
+        
+        <!-- Simple, elegant divider -->
+        <div class="h-px w-24 mx-auto mb-8 bg-red-600"></div>
 
-        <!-- Enhanced divider with animation -->
-        <div class="relative h-2 max-w-md mx-auto mb-8 bg-gradient-to-r from-red-800 via-red-600 to-red-500 border-2 border-white transform rotate-1"></div>
+        <!-- Clean subtitle with improved readability -->
+        <p class="text-gray-300 text-lg mb-10">Create and visualize your last.fm music listening history</p>
 
-        <!-- Improved subtitle with better typography and width constraint -->
-        <p class="text-white text-xl max-w-lg mx-auto leading-relaxed mb-12 font-bold">Create and visualize your music listening history in a modern, interactive dashboard</p>
-
-        <!-- Call to action button -->
-        <a href="#main-content" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-800 via-red-600 to-red-500 text-white font-black text-lg uppercase tracking-wide transform hover:translate-x-1 hover:translate-y-1 transition-transform duration-200 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.8)] border-4 border-white">
+        <!-- Neobrutalism-style button -->
+        <a href="#main-content" class="inline-block px-10 py-4 bg-red-600 text-white font-bold uppercase tracking-wider rounded-none border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 mb-10">
           Get Started
-          <svg class="w-5 h-5 ml-2 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-          </svg>
         </a>
+        
+        <!-- Social media icons with neobrutalism styling -->
+        <div class="flex justify-center items-center space-x-8 mt-8">
+          <!-- GitHub Icon -->
+          <a href="https://github.com/Nachthirsch" target="_blank" class="bg-gray-800 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+            </svg>
+          </a>
+          
+          <!-- Instagram Icon -->
+          <a href="http://instagram.com/yuunaagi" target="_blank" class="bg-gradient-to-br from-purple-600 to-pink-500 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd" />
+            </svg>
+          </a>
+          
+          <!-- Ko-fi Icon -->
+          <a href="https://ko-fi.com/yunaagi" target="_blank" class="bg-blue-600 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z" />
+            </svg>
+          </a>
+        </div>
       </div>
 
-      <!-- Bottom scroll indicator -->
-      <div class="absolute bottom-8 left-0 right-0 flex justify-center animate-bounce">
-        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </div>
     </div>
 
     <!-- Main content area -->
@@ -272,17 +262,12 @@ onMounted(() => {
       <!-- Buttons Row -->
       <div class="mb-4 text-center space-x-4">
         <!-- User Profile Toggle Button -->
-        <button @click="showUserProfile = !showUserProfile" class="bg-gradient-to-r from-red-700 to-red-900 hover:from-red-800 hover:to-red-950 text-white font-bold py-2 px-4 rounded-full mb-4 inline-flex items-center">
+        <button @click="showUserProfile = !showUserProfile" class="bg-red-700 text-white font-bold py-2 px-6 rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 mb-4 inline-flex items-center">
           <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
           </svg>
           {{ showUserProfile ? "Hide User Profile" : "View User Profile" }}
         </button>
-      </div>
-
-      <!-- Spotify Test Component -->
-      <div v-if="showSpotifyTest" class="mb-8">
-        <SpotifyTest />
       </div>
 
       <!-- User Profile Component -->
@@ -294,7 +279,7 @@ onMounted(() => {
         <div class="flex flex-col">
           <label for="username" class="mb-2 font-black text-white uppercase tracking-wide">Last.fm Username</label>
           <div class="relative">
-            <input id="username" v-model="username" type="text" placeholder="Enter your Last.fm username" class="w-full p-3 bg-gray-900 border-4 border-white text-base text-white placeholder-gray-500 focus:ring-0 focus:outline-none focus:border-red-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)]" />
+            <input id="username" v-model="username" type="text" placeholder="Enter your Last.fm username" class="w-full p-3 bg-gray-900 border-4 border-black text-base text-white placeholder-gray-500 focus:ring-0 focus:outline-none focus:border-red-500 rounded-none shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)]" />
             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-white">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -306,7 +291,7 @@ onMounted(() => {
         <div class="flex flex-col">
           <label for="period" class="mb-2 font-black text-white uppercase tracking-wide">Time Period</label>
           <div class="relative">
-            <select id="period" v-model="period" class="w-full appearance-none p-3 bg-gray-900 border-4 border-white text-base text-white focus:ring-0 focus:outline-none focus:border-red-500 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)] pr-10">
+            <select id="period" v-model="period" class="w-full appearance-none p-3 bg-gray-900 border-4 border-black text-base text-white focus:ring-0 focus:outline-none focus:border-red-500 rounded-none shadow-[4px_4px_0px_0px_rgba(255,255,255,0.2)] pr-10">
               <option v-for="option in periods" :key="option.value" :value="option.value">
                 {{ option.label }}
               </option>
@@ -320,7 +305,7 @@ onMounted(() => {
         </div>
 
         <div class="flex items-end">
-          <button @click="fetchData" :disabled="isLoading" class="w-full p-3 bg-gradient-to-r from-red-500 via-red-600 to-red-700 text-white font-black text-lg uppercase tracking-wide transform hover:translate-x-1 hover:translate-y-1 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.8)] border-4 border-black disabled:opacity-50 disabled:cursor-not-allowed transition-transform duration-200 flex items-center justify-center gap-2">
+          <button @click="fetchData" :disabled="isLoading" class="w-full p-3 bg-red-600 text-white font-black text-lg uppercase tracking-wide rounded-none border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2">
             <svg v-if="isLoading" class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -412,7 +397,32 @@ onMounted(() => {
           <span class="w-5 h-5 bg-red-600 border-2 border-black"></span>
           <span class="w-5 h-5 bg-red-700 border-2 border-black transform rotate-[-10deg]"></span>
         </div>
-        <p class="font-bold mb-2">Powered by <a href="https://www.last.fm/api" target="_blank" class="text-red-500 hover:underline hover:text-red-400 transition-colors">Last.fm API</a> and <a href="https://www.spotify.com/" target="_blank" class="text-green-500 hover:underline hover:text-greeb-400 transition-colors">Spotify API</a> | Built with Vue 3, Pinia, and Tailwind CSS</p>
+        
+        <!-- Social media icons in footer with neobrutalism styling -->
+        <div class="flex justify-center items-center space-x-8 mb-6">
+          <!-- GitHub Icon -->
+          <a href="https://github.com/Nachthirsch" target="_blank" class="bg-gray-800 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+            </svg>
+          </a>
+          
+          <!-- Instagram Icon -->
+          <a href="http://instagram.com/yuunaagi" target="_blank" class="bg-gradient-to-br from-purple-600 to-pink-500 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+            <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd" />
+            </svg>
+          </a>
+          
+          <!-- Ko-fi Icon -->
+          <a href="https://ko-fi.com/yunaagi" target="_blank" class="bg-blue-600 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+            <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z" />
+            </svg>
+          </a>
+        </div>
+        
+        <p class="font-bold mb-2">Powered by <a href="https://www.last.fm/api" target="_blank" class="text-red-500 hover:underline hover:text-red-400 transition-colors">Last.fm API</a> and <a href="https://www.spotify.com/" target="_blank" class="text-green-500 hover:underline hover:text-green-400 transition-colors">Spotify API</a> | Built with Vue 3, Pinia, and Tailwind CSS</p>
         <p class="font-bold">Made with <span class="text-red-500 text-xl relative top-0.5">❤️</span> by <a href="https://github.com/nachthirsch" target="_blank" class="text-red-500 hover:underline hover:text-red-400 transition-colors">yuunaagi</a></p>
       </footer>
     </div>
