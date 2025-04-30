@@ -247,10 +247,11 @@ onMounted(() => {
           </a>
           
           <!-- Ko-fi Icon -->
-          <a href="https://ko-fi.com/yunaagi" target="_blank" class="bg-blue-600 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+          <a href="https://ko-fi.com/yunaagi" target="_blank" class="bg-blue-600 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 flex items-center">
             <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z" />
             </svg>
+            <span class="ml-2 text-white text-xs font-bold typewriter">I appreciate your support!</span>
           </a>
         </div>
       </div>
@@ -260,20 +261,7 @@ onMounted(() => {
     <!-- Main content area -->
     <div id="main-content" class="max-w-6xl mx-auto p-4 md:p-8">
       <!-- Buttons Row -->
-      <div class="mb-4 text-center space-x-4">
-        <!-- User Profile Toggle Button -->
-        <button @click="showUserProfile = !showUserProfile" class="bg-red-700 text-white font-bold py-2 px-6 rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 mb-4 inline-flex items-center">
-          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-          </svg>
-          {{ showUserProfile ? "Hide User Profile" : "View User Profile" }}
-        </button>
-      </div>
 
-      <!-- User Profile Component -->
-      <div v-if="showUserProfile" class="mb-8">
-        <UserProfile :username="username" />
-      </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 bg-black border-4 border-white shadow-[12px_12px_0px_0px_rgba(255,255,255,0.2)] p-8">
         <div class="flex flex-col">
@@ -287,6 +275,8 @@ onMounted(() => {
             </div>
           </div>
         </div>
+
+
 
         <div class="flex flex-col">
           <label for="period" class="mb-2 font-black text-white uppercase tracking-wide">Time Period</label>
@@ -314,6 +304,21 @@ onMounted(() => {
             <span v-else>Fetch Data</span>
           </button>
         </div>
+      </div>
+
+            <div class="mb-4 text-center space-x-4">
+        <!-- User Profile Toggle Button -->
+        <button @click="showUserProfile = !showUserProfile" class="bg-red-700 text-white font-bold py-2 px-6 rounded-none border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 mb-4 inline-flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+          </svg>
+          {{ showUserProfile ? "Hide User Profile" : "View User Profile" }}
+        </button>
+      </div>
+
+      <!-- User Profile Component -->
+      <div v-if="showUserProfile" class="mb-8">
+        <UserProfile :username="username" />
       </div>
 
       <!-- Item Details Panel -->
@@ -415,10 +420,11 @@ onMounted(() => {
           </a>
           
           <!-- Ko-fi Icon -->
-          <a href="https://ko-fi.com/yunaagi" target="_blank" class="bg-blue-600 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200">
+          <a href="https://ko-fi.com/yunaagi" target="_blank" class="bg-blue-600 p-2 border-2 border-white rounded-none shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 flex items-center">
             <svg class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
               <path d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z" />
             </svg>
+            <span class="ml-2 text-white text-xs font-bold typewriter">I appreciate your support!</span>
           </a>
         </div>
         
@@ -458,10 +464,44 @@ onMounted(() => {
   }
 }
 
+/* Animation for fading in and out */
+@keyframes pulse-fade {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+/* Animation for typewriter effect */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
 .animate-float {
   animation-name: float;
   animation-duration: 15s;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
+}
+
+.animate-pulse-fade {
+  animation-name: pulse-fade;
+  animation-duration: 3s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 3s steps(40, end) 1s 1 normal both;
+  width: 0;
+  display: inline-block;
 }
 </style>
