@@ -188,7 +188,7 @@ async function generateImage() {
       // Apply fixed sizing to sub-sections
       const userSection = contentSection.querySelector('.user-section');
       if (userSection) {
-        userSection.style.padding = '20px';
+        userSection.style.padding = '30px 20px';
       }
       
       const profileImage = contentSection.querySelector('.profile-image-container');
@@ -270,6 +270,10 @@ async function generateImage() {
       canvasHeight: FIXED_HEIGHT,
       style: {
         transform: 'none',
+      },
+      filter: (node) => {
+        // Filter out any remaining header section elements that might be in the DOM
+        return !node.classList || !node.classList.contains('header-section');
       }
     });
     
@@ -331,11 +335,6 @@ onMounted(async () => {
       
       <!-- Share card content -->
       <div v-else class="share-card-content">
-        <!-- Header section -->
-        <div class="header-section">
-          <h2 class="header-text">Made by <span class="text-accent">LastSongs</span></h2>
-        </div>
-        
         <!-- User info section -->
         <div class="user-section">
           <div class="profile-image-container">
@@ -592,44 +591,10 @@ onMounted(async () => {
   margin-bottom: 16px;
 }
 
-/* Header section */
-.header-section {
-  background-color: #fafafa;
-  padding: 16px;
-  text-align: center;
-  border-bottom: 1px solid #eee;
-  position: relative;
-}
-
-.header-section::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #ff5252, transparent);
-  opacity: 0.4;
-}
-
-.header-text {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 500;
-  color: #333;
-  letter-spacing: 0.5px;
-}
-
-.text-accent {
-  color: #ff5252;
-  font-weight: 600;
-  position: relative;
-}
-
 /* User section */
 .user-section {
   background-color: #ffffff;
-  padding: 20px;
+  padding: 30px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
