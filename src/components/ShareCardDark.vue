@@ -178,7 +178,7 @@ async function generateImage() {
     cardClone.style.border = '1px solid #2a2a2a';
     cardClone.style.overflow = 'hidden';
     cardClone.style.position = 'relative';
-    cardClone.style.borderRadius = '0';
+    cardClone.style.borderRadius = '0'; // Ensure sharp borders in the final image
     
     // Apply fixed dimensions to all child elements to ensure consistency
     const contentSection = cardClone.querySelector('.share-card-content');
@@ -195,6 +195,7 @@ async function generateImage() {
       if (profileImage) {
         profileImage.style.width = '80px';
         profileImage.style.height = '80px';
+        profileImage.style.borderRadius = '0'; // Ensure sharp borders for profile image
       }
       
       // Reset font sizes to fixed values
@@ -222,6 +223,7 @@ async function generateImage() {
         if (statCover) {
           statCover.style.width = '70px';
           statCover.style.height = '70px';
+          statCover.style.borderRadius = '0'; // Ensure sharp borders for covers
         }
         
         const itemName = row.querySelector('.item-name');
@@ -462,10 +464,11 @@ onMounted(async () => {
   background-color: #2a2a2a;
   color: #e0e0e0;
   padding: 5px 12px;
-  border-radius: 4px;
+  border-radius: 0;
   font-size: 14px;
   text-align: center;
   margin-bottom: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .fixed-size-info p {
@@ -481,30 +484,36 @@ onMounted(async () => {
 }
 
 .generate-btn {
-  background-color: #2a2a2a;
-  color: #e0e0e0;
-  padding: 10px 20px;
+  background-color: #ff5252;
+  color: white;
+  padding: 10px 24px;
   font-weight: 500;
   font-size: 14px;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
   text-transform: none;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(255, 82, 82, 0.25);
 }
 
 .generate-btn:hover {
-  background-color: #3a3a3a;
+  background-color: #ff3838;
+  box-shadow: 0 3px 10px rgba(255, 82, 82, 0.35);
+  transform: translateY(-1px);
 }
 
 .generate-btn:active {
-  background-color: #444;
+  background-color: #e04848;
+  transform: translateY(0);
 }
 
 .generate-btn:disabled {
   background-color: #222;
   color: #666;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Share card */
@@ -516,9 +525,10 @@ onMounted(async () => {
   max-height: 75vh;
   background-color: #121212;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  border-radius: 0;
   margin: 0 auto;
+  border-left: 4px solid #ff5252;
 }
 
 /* Apply responsive styles for very small screens */
@@ -558,7 +568,7 @@ onMounted(async () => {
   height: 32px;
   border: 2px solid #333;
   border-top: 2px solid #ff5252;
-  border-radius: 50%;
+  border-radius: 0;
   animation: spin 1s linear infinite;
   margin-bottom: 16px;
 }
@@ -578,16 +588,28 @@ onMounted(async () => {
   font-weight: normal;
   color: #fff;
   background-color: #ff5252;
-  border-radius: 50%;
+  border-radius: 0;
   margin-bottom: 16px;
 }
 
 /* Header section */
 .header-section {
   background-color: #1a1a1a;
-  padding: 12px;
+  padding: 16px;
   text-align: center;
   border-bottom: 1px solid #2a2a2a;
+  position: relative;
+}
+
+.header-section::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ff5252, transparent);
+  opacity: 0.4;
 }
 
 .header-text {
@@ -595,33 +617,38 @@ onMounted(async () => {
   font-size: 16px;
   font-weight: 500;
   color: #e0e0e0;
+  letter-spacing: 0.5px;
 }
 
 .text-accent {
   color: #ff5252;
   font-weight: 600;
+  position: relative;
 }
 
 /* User section */
 .user-section {
   background-color: #181818;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   border-bottom: 1px solid #2a2a2a;
+  position: relative;
 }
 
 .profile-image-container {
   width: 64px;
   height: 64px;
   background-color: #2a2a2a;
-  border-radius: 50%;
+  border-radius: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
 }
 
 /* Responsive adjustments for smaller screens */
@@ -663,6 +690,7 @@ onMounted(async () => {
   font-size: 24px;
   font-weight: 500;
   color: #aaa;
+  background: linear-gradient(135deg, #2a2a2a, #222);
 }
 
 .user-details {
@@ -671,26 +699,31 @@ onMounted(async () => {
 }
 
 .username {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: 0.3px;
 }
 
 .play-count {
   font-size: 14px;
   font-weight: 400;
   color: #aaa;
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: #222;
+  border-left: 2px solid #ff5252;
 }
 
 /* Period section */
 .period-section {
   background-color: #1a1a1a;
-  padding: 12px 16px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -701,12 +734,17 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 500;
   color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .period-value {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: #ff5252;
+  letter-spacing: 0.5px;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255, 82, 82, 0.3);
 }
 
 /* Smaller text for tight spaces */
@@ -731,8 +769,29 @@ onMounted(async () => {
 .stat-row {
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 18px 20px;
   border-bottom: 1px solid #2a2a2a;
+  transition: background-color 0.2s;
+  position: relative;
+}
+
+.stat-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background-color: transparent;
+  transition: background-color 0.2s;
+}
+
+.stat-row:hover {
+  background-color: #1a1a1a;
+}
+
+.stat-row:hover::before {
+  background-color: #ff5252;
 }
 
 /* Responsive adjustments for stat rows on small screens */
@@ -760,21 +819,29 @@ onMounted(async () => {
   font-size: 14px;
   font-weight: 500;
   color: #aaa;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+  padding: 3px 10px;
+  background-color: #222;
 }
 
 .stat-content {
   display: flex;
-  gap: 14px;
+  gap: 16px;
 }
 
 .stat-cover {
-  width: 56px;
-  height: 56px;
+  width: 60px;
+  height: 60px;
   background-color: #2a2a2a;
-  border-radius: 4px;
+  border-radius: 0;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #333;
 }
 
 .stat-cover img {
@@ -789,7 +856,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #333;
+  background: linear-gradient(135deg, #2a2a2a, #222);
   color: #aaa;
   font-size: 20px;
   font-weight: 500;
@@ -805,7 +872,7 @@ onMounted(async () => {
 }
 
 .item-name {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   color: #ffffff;
   margin-bottom: 2px;
@@ -814,13 +881,14 @@ onMounted(async () => {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
+  letter-spacing: 0.2px;
 }
 
 .item-artist {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 400;
   color: #aaa;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   line-height: 1.2;
   overflow: hidden;
   display: -webkit-box;
@@ -832,6 +900,10 @@ onMounted(async () => {
   font-size: 12px;
   font-weight: 400;
   color: #777;
+  display: inline-block;
+  padding: 1px 6px;
+  background-color: #222;
+  border-left: 1px solid #ff5252;
 }
 
 /* Responsive adjustments for text on small screens */
@@ -855,6 +927,18 @@ onMounted(async () => {
   text-align: center;
   background-color: #1a1a1a;
   border-top: 1px solid #2a2a2a;
+  position: relative;
+}
+
+.watermark-section::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #ff5252, transparent);
+  opacity: 0.4;
 }
 
 .watermark-url {
@@ -862,6 +946,7 @@ onMounted(async () => {
   font-weight: 400;
   font-size: 12px;
   color: #777;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  text-transform: lowercase;
 }
 </style> 
