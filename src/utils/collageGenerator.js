@@ -516,48 +516,6 @@ export async function generateCollage(options) {
         ctx.stroke();
       }
       
-      // Draw rank badge with enhanced neobrutalism style
-      const badgeSize = 44; // Larger for more impact
-      const badgeX = adjustedX + 12;
-      const badgeY = adjustedY + 12;
-      
-      // Draw badge shadow - DEEPER for neobrutalism
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-      ctx.beginPath();
-      ctx.arc(badgeX + badgeSize/2 + 6, badgeY + badgeSize/2 + 6, badgeSize/2, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // Draw badge background
-      ctx.fillStyle = colors.rankBadgeBg;
-      ctx.beginPath();
-      ctx.arc(badgeX + badgeSize/2, badgeY + badgeSize/2, badgeSize/2, 0, Math.PI * 2);
-      ctx.fill();
-      
-      // Draw badge border - thicker for neobrutalism
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(badgeX + badgeSize/2, badgeY + badgeSize/2, badgeSize/2, 0, Math.PI * 2);
-      ctx.stroke();
-      
-      // Draw rank number with shadow and outline
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-      ctx.font = 'bold 22px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(`#${itemData.rank}`, badgeX + badgeSize/2 + 2, badgeY + badgeSize/2 + 2);
-      
-      ctx.fillStyle = colors.accent;
-      ctx.fillText(`#${itemData.rank}`, badgeX + badgeSize/2, badgeY + badgeSize/2);
-      
-      // Draw outline around text for enhanced neobrutalism
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 1.5;
-      ctx.strokeText(`#${itemData.rank}`, badgeX + badgeSize/2, badgeY + badgeSize/2);
-      
-      // Reset text baseline
-      ctx.textBaseline = 'alphabetic';
-      
       // Draw name if option enabled
       if (showNames) {
         // Create semi-transparent background for text - taller for neobrutalism
